@@ -7,16 +7,12 @@
   import Footer from '$lib/components/Footer.svelte'
   import { onMount } from 'svelte'
   import { invalidate } from '$app/navigation'
-  import { invoices, loadInvoices } from '$lib/stores/invoices'
-  import { findIfHasOverdueUnpaidInvoice } from '$lib/utils'
-  import OverdueInvoiceAlert from '$lib/components/OverdueInvoiceAlert.svelte'
 
   let { data, children } = $props()
 
   let { supabase, session } = $derived(data)
 
   let brandId = $derived(session?.user?.email)
-  let hasOverDueUnpaidInvoice = $derived(findIfHasOverdueUnpaidInvoice($invoices))
 
   // Sidebar state management - initialize based on screen size
   let menuOpen = $state(false)
@@ -26,9 +22,6 @@
     // Desktop: open by default, Mobile: closed by default
     menuOpen = window.innerWidth >= 1024
 
-    if (brandId) {
-      loadInvoices(supabase, brandId)
-    }
     const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
       if (newSession?.expires_at !== session?.expires_at) {
         invalidate('supabase:auth')
@@ -51,7 +44,7 @@
 </svelte:head>
 
 <!-- Normal Application Layout -->
-<div class="bg-base-200 flex min-h-screen flex-col">
+<div class="flex min-h-screen flex-col bg-base-200">
   <div class="flex flex-1">
     <Navbar
       isUserLoggedIn={Boolean(session?.user)}
@@ -66,11 +59,6 @@
         : 'lg:ml-0'}"
     >
       <div class="min-h-screen p-4 {!menuOpen ? 'pt-16' : ''}">
-        <!-- Overdue Invoice Alert -->
-        {#if hasOverDueUnpaidInvoice && session?.user}
-          <OverdueInvoiceAlert />
-        {/if}
-
         {@render children?.()}
       </div>
 
