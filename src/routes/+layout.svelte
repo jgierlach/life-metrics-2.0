@@ -7,6 +7,7 @@
   import Footer from '$lib/components/Footer.svelte'
   import { onMount } from 'svelte'
   import { invalidate } from '$app/navigation'
+  import { page } from '$app/stores'
 
   let { data, children } = $props()
 
@@ -16,6 +17,9 @@
 
   // Sidebar state management - initialize based on screen size
   let menuOpen = $state(false)
+
+  // Determine if we are on an app route (e.g., /app or any sub-route)
+  let isAppRoute = $derived(($page.url.pathname || '/').startsWith('/app'))
 
   onMount(() => {
     // Set initial sidebar state based on screen size
@@ -43,29 +47,34 @@
   </script>
 </svelte:head>
 
-<!-- Normal Application Layout -->
-<div class="flex min-h-screen flex-col bg-base-200">
-  <div class="flex flex-1">
-    <Navbar
-      isUserLoggedIn={Boolean(session?.user)}
-      {menuOpen}
-      toggleMenu={() => (menuOpen = !menuOpen)}
-    />
+{#if isAppRoute}
+  <!-- Application Layout for /app routes -->
+  <div class="flex min-h-screen flex-col bg-base-200">
+    <div class="flex flex-1">
+      <Navbar
+        isUserLoggedIn={Boolean(session?.user)}
+        {menuOpen}
+        toggleMenu={() => (menuOpen = !menuOpen)}
+      />
 
-    <!-- Main content area with conditional margin based on sidebar state -->
-    <div
-      class="flex-grow overflow-auto transition-all duration-300 ease-in-out {menuOpen
-        ? 'lg:ml-64'
-        : 'lg:ml-0'}"
-    >
-      <div class="min-h-screen p-4 {!menuOpen ? 'pt-16' : ''}">
-        {@render children?.()}
+      <!-- Main content area with conditional margin based on sidebar state -->
+      <div
+        class="flex-grow overflow-auto transition-all duration-300 ease-in-out {menuOpen
+          ? 'lg:ml-64'
+          : 'lg:ml-0'}"
+      >
+        <div class="min-h-screen p-4 {!menuOpen ? 'pt-16' : ''}">
+          {@render children?.()}
+        </div>
+
+        <Footer />
       </div>
-
-      <Footer />
     </div>
   </div>
-</div>
+{:else}
+  <!-- Public/Landing routes (e.g., /) render their own layout/styles -->
+  {@render children?.()}
+{/if}
 
 <style global>
   body,
