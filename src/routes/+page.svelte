@@ -32,25 +32,25 @@
       <ul class="menu menu-horizontal px-1">
         <li><a href="#features" class="hover:text-primary">Features</a></li>
         <li><a href="#how-it-works" class="hover:text-primary">How It Works</a></li>
-        <li><a href="#pricing" class="hover:text-primary">Pricing</a></li>
-        <li><a href="#about" class="hover:text-primary">About</a></li>
+        <!-- <li><a href="#pricing" class="hover:text-primary">Pricing</a></li> -->
+        <!-- <li><a href="#about" class="hover:text-primary">About</a></li> -->
       </ul>
     </div>
     <div class="navbar-end">
       <a href="/login" class="btn btn-ghost mr-2">Sign In</a>
-      <button class="btn btn-primary">Get Started</button>
+      <a href="/signup" class="btn btn-primary">Get Started</a>
     </div>
   </div>
 
   <!-- Hero Section -->
-  <div class="from-primary/10 to-secondary/10 hero min-h-screen bg-gradient-to-br">
+  <div class="from-primary/10 to-secondary/10 hero min-h-screen bg-green-50">
     <div class="hero-content text-center">
       <div class="max-w-4xl">
         <div class="mb-5">
           {#if data.session}
             <h1 class="text-center text-2xl font-bold">
               You are logged in as {data.session.user.email}. Go to
-              <a href="/app" class="text-blue-500 underline">app</a>
+              <a href="/app" class="text-purple-800 underline">app</a>
             </h1>
           {/if}
         </div>
@@ -65,25 +65,6 @@
         <div class="flex flex-col justify-center gap-4 sm:flex-row">
           <button class="btn btn-primary btn-lg">Start Free Trial</button>
           <button class="btn btn-outline btn-lg">Watch Demo</button>
-        </div>
-        <div class="mt-12">
-          <div class="stats stats-vertical bg-base-100 shadow lg:stats-horizontal">
-            <div class="stat">
-              <div class="stat-title">Active Users</div>
-              <div class="text-primary stat-value">50K+</div>
-              <div class="stat-desc">Growing daily</div>
-            </div>
-            <div class="stat">
-              <div class="stat-title">Metrics Tracked</div>
-              <div class="text-secondary stat-value">2.5M+</div>
-              <div class="stat-desc">This month</div>
-            </div>
-            <div class="stat">
-              <div class="stat-title">Life Improvements</div>
-              <div class="stat-value text-accent">95%</div>
-              <div class="stat-desc">User satisfaction</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
