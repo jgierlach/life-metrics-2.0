@@ -22,8 +22,8 @@
         >
           <li><a href="#features">Features</a></li>
           <li><a href="#how-it-works">How It Works</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#about">About</a></li>
+          <!-- <li><a href="#pricing">Pricing</a></li> -->
+          <!-- <li><a href="#about">About</a></li> -->
         </ul>
       </div>
       <button class="text-primary btn btn-ghost text-xl font-bold">Life Metrics</button>
@@ -37,24 +37,23 @@
       </ul>
     </div>
     <div class="navbar-end">
-      <button class="btn btn-ghost mr-2">Sign In</button>
+      <a href="/login" class="btn btn-ghost mr-2">Sign In</a>
       <button class="btn btn-primary">Get Started</button>
     </div>
   </div>
-
-  <section class="container mx-auto mt-6">
-    {#if data.session}
-      <h1 class="text-center text-2xl font-bold">
-        You are logged in as {data.session.user.email}. Go to
-        <a href="/app" class="text-blue-500 underline">app</a>
-      </h1>
-    {/if}
-  </section>
 
   <!-- Hero Section -->
   <div class="from-primary/10 to-secondary/10 hero min-h-screen bg-gradient-to-br">
     <div class="hero-content text-center">
       <div class="max-w-4xl">
+        <div class="mb-5">
+          {#if data.session}
+            <h1 class="text-center text-2xl font-bold">
+              You are logged in as {data.session.user.email}. Go to
+              <a href="/app" class="text-blue-500 underline">app</a>
+            </h1>
+          {/if}
+        </div>
         <h1 class="mb-6 text-balance text-5xl font-bold text-neutral lg:text-7xl">
           Transform Your Life with
           <span class="text-primary">Data-Driven</span> Insights

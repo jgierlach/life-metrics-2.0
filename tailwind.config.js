@@ -1,3 +1,6 @@
+import daisyui from 'daisyui'
+import typography from '@tailwindcss/typography'
+
 const PRIMARY_COLOR_PALETTE = {
   50: '#E7F0FE',
   100: '#B4D0FD',
@@ -38,7 +41,8 @@ const BACKGROUND_COLOR_PALETTE = {
 }
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
+  darkMode: ['class', '[data-theme="dark"]'],
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     extend: {
@@ -69,7 +73,7 @@ module.exports = {
       },
     },
   },
-  plugins: [require('daisyui'), require('@tailwindcss/typography')],
+  plugins: [daisyui, typography],
   daisyui: {
     themes: ['light', 'dark'], // Define light and dark themes
   },
