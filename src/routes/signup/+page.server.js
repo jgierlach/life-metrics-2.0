@@ -11,38 +11,37 @@ export const actions = {
     const email = formData.get('email')?.toString() || ''
     const password = formData.get('password')?.toString() || ''
     const name = formData.get('name')?.toString() || ''
+    const phoneNumberRaw = formData.get('phoneNumber')?.toString() || ''
+
+    // Normalize to a simple E.164-like string. This is a lightweight heuristic,
+    // not a full libphonenumber implementation.
+    /** @param {string} input */
+    const normalizePhone = (input) => {
+      if (!input) return ''
+      let digitsOnly = input.replace(/\D/g, '')
+      if (digitsOnly.length === 0) return ''
+      if (digitsOnly.length === 10) {
+        return `+1${digitsOnly}`
+      }
+      if (digitsOnly.length >= 11 && digitsOnly.length <= 15) {
+        return `+${digitsOnly}`
+      }
+      return ''
+    }
+
+    const normalizedPhone = normalizePhone(phoneNumberRaw)
+    if (!normalizedPhone) {
+      return fail(400, {
+        message: 'Please enter a valid phone number',
+        data: { email, name, phoneNumber: phoneNumberRaw },
+        success: false,
+      })
+    }
 
     // Initialize Supabase admin with service role key
     const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
     try {
-      // First, create Stripe customer
-      const stripeResponse = await fetch('/signup/create-customer-in-stripe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email }),
-      })
-
-      if (!stripeResponse.ok) {
-        const errorData = await stripeResponse.json()
-        return fail(500, {
-          message: `Failed to create billing customer: ${errorData.error}`,
-          data: { email, name },
-          success: false,
-        })
-      }
-
-      const { customerId: stripeCustomerId } = await stripeResponse.json()
-
-      // Sign up supabase user
-      // const { data, error } = await supabase.auth.signUp({
-      //   email: email,
-      //   password: password,
-      //   options: {
-      //     data: { name: name },
-      //   },
-      // })
-
       // Create the user in Supabase Auth
       const { data, error } = await supabaseAdmin.auth.admin.createUser({
         email,
@@ -53,7 +52,7 @@ export const actions = {
       if (error) {
         return fail(400, {
           message: error.message ?? 'Account with email already exists',
-          data: { email, name },
+          data: { email, name, phoneNumber: phoneNumberRaw },
           success: false,
         })
       }
@@ -64,7 +63,7 @@ export const actions = {
       if (!user?.id) {
         return fail(500, {
           message: 'Failed to create user account',
-          data: { email, name },
+          data: { email, name, phoneNumber: phoneNumberRaw },
           success: false,
         })
       }
@@ -75,39 +74,14 @@ export const actions = {
         email: email,
         password: password,
         name: name,
-        service_role: '3pl_customer',
-        has_expiration_dates: null,
-        pass_on_card_fees: 'true',
-        stripe_customer_id: stripeCustomerId,
+        phone_number: normalizedPhone,
       })
 
       if (userInsertError) {
         console.error('Error: failed to insert new user into users table', userInsertError)
         return fail(500, {
           message: userInsertError.message ?? 'Failed to create user profile.',
-          data: { email, name },
-          success: false,
-        })
-      }
-
-      // Insert into 3pl_customers table for all new signups
-      const { error: customerInsertError } = await supabase.from('3pl_customers').insert({
-        user_id: user.id,
-        per_order_fee: '0',
-        per_order_unit_fee: '0',
-        per_unit_fba_pack_prep: '0',
-        per_unit_wfs_pack_prep: '0',
-        per_unit_return_fee: '0',
-        per_pallet_out: '0',
-        per_pallet_monthly_storage_fee: '0',
-        freight_percentage_markup: '0',
-      })
-
-      if (customerInsertError) {
-        console.error('Error: failed to insert into 3pl_customers table', customerInsertError)
-        return fail(500, {
-          message: customerInsertError.message ?? 'Failed to create customer profile.',
-          data: { email, name },
+          data: { email, name, phoneNumber: phoneNumberRaw },
           success: false,
         })
       }
@@ -120,7 +94,7 @@ export const actions = {
       console.error('Error during signup process:', error)
       return fail(500, {
         message: 'An unexpected error occurred during signup',
-        data: { email, name },
+        data: { email, name, phoneNumber: phoneNumberRaw },
         success: false,
       })
     }
