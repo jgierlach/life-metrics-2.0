@@ -1,7 +1,15 @@
 import { json } from '@sveltejs/kit'
 
+/** @type {import('./$types').RequestHandler} */
 export async function PUT({ request, locals }) {
   const { id, content, user_id } = await request.json()
+
+  if (!id || !user_id || !content) {
+    return json(
+      { message: 'Missing or invalid fields required to edit journal entry.' },
+      { status: 400 },
+    )
+  }
 
   const row = {
     content,
@@ -15,7 +23,8 @@ export async function PUT({ request, locals }) {
     .select()
 
   if (error) {
-    console.error(error)
+    console.error('Error editing journal entry', error)
+    return json({ message: 'Failed to edit journal entry' }, { status: 500 })
   }
 
   return json({
