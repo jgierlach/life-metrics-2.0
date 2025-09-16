@@ -203,21 +203,8 @@
 {#each journal as entry}
   <div class="mt-6 flex justify-center">
     <div class="card mx-6 w-full max-w-lg bg-base-100 p-4">
-      <div class="card-body flex items-center justify-between">
-        <div class="flex-grow-0 text-center" style="flex-basis: 30%;">
-          <p><strong>{formatTimestamp(entry.created_at)}</strong></p>
-        </div>
-        <div class="flex flex-grow items-center justify-end space-x-2">
-          <button
-            onclick={() => togglePin(entry)}
-            class="btn btn-ghost btn-sm"
-            title={entry.is_pinned ? 'Unpin' : 'Pin'}
-            aria-label={entry.is_pinned ? 'Unpin entry' : 'Pin entry'}
-          >
-            <i
-              class={`fas ${entry.is_pinned ? 'fa-thumbtack rotate-12 text-warning' : 'fa-thumbtack text-base-content/60'}`}
-            ></i>
-          </button>
+      <div class="card-body">
+        <div class="flex items-center justify-center gap-2">
           <button
             onclick={() => toggleEdit(entry)}
             class="btn btn-sm"
@@ -234,6 +221,19 @@
           >
             <i class="fas fa-trash-alt fa-xs"></i>
           </button>
+          <button
+            onclick={() => togglePin(entry)}
+            class="btn btn-ghost btn-sm"
+            title={entry.is_pinned ? 'Unpin' : 'Pin'}
+            aria-label={entry.is_pinned ? 'Unpin entry' : 'Pin entry'}
+          >
+            <i
+              class={`fas ${entry.is_pinned ? 'fa-thumbtack rotate-12 text-warning' : 'fa-thumbtack text-base-content/60'}`}
+            ></i>
+          </button>
+        </div>
+        <div class="mt-2 text-center">
+          <p class="font-semibold">{formatTimestamp(entry.created_at)}</p>
         </div>
       </div>
       {#if entryToEdit && entryToEdit.id === entry.id}
