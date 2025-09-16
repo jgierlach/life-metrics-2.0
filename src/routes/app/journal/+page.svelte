@@ -255,10 +255,16 @@
 <!-- DELETE ENTRY MODAL BEGINS -->
 <div class={showDeleteEntryModal ? 'modal modal-open' : 'modal'}>
   <div class="modal-box">
+    <button
+      onclick={() => (showDeleteEntryModal = false)}
+      class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
+    >
     <h1 class="text-center text-lg font-bold">Are you sure you want to delete this entry?</h1>
-    <p class="entry-content py-4" style="white-space: pre-line;">
-      {entryToDelete ? entryToDelete.content : ''}
-    </p>
+    <div class="entry-content prose py-4" style="white-space: pre-line;">
+      {#if entryToDelete}
+        {@html renderMarkdown(entryToDelete.content)}
+      {/if}
+    </div>
     <div class="flex justify-center">
       <button
         onclick={() => entryToDelete && deleteEntry(entryToDelete.id)}
