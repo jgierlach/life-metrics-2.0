@@ -14,19 +14,22 @@ export async function load({ params, locals, depends }) {
     throw error(400, 'User id is required')
   }
 
-  const { data: journal, error: journalError } = await supabase
+  const { data: journalRows, error: journalError } = await supabase
     .from('journal')
     .select('*')
     .eq('user_id', userId)
-    .order('is_pinned', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
 
   if (journalError) {
     throw error(500, 'Failed to fetch orderLineItems')
   }
 
+  // Pinned first (is_pinned === true), then all others by created_at (already sorted)
+  const pinned = (journalRows || []).filter((j) => j.is_pinned === true)
+  const others = (journalRows || []).filter((j) => j.is_pinned !== true)
+
   return {
-    journal,
+    journal: [...pinned, ...others],
     session: locals.session,
   }
 }
