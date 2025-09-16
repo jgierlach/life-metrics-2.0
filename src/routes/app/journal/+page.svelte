@@ -6,7 +6,7 @@
   import { marked } from 'marked'
   import SuccessOverlay from '$lib/components/SuccessOverlay.svelte'
 
-  /** @typedef {{ id: string; created_at: string; content: string }} JournalEntry */
+  /** @typedef {{ id: string; created_at: string; content: string; is_pinned?: boolean | null }} JournalEntry */
 
   const { data } = $props()
   let journal = $derived(data?.journal ?? [])
@@ -134,6 +134,25 @@
       alert(`Failed to create Journal: ${errorData.message}`)
     }
   }
+
+  /** @param {JournalEntry} post */
+  async function togglePin(post) {
+    const response = await fetch('/app/api/journal/toggle-pin', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: post.id,
+        user_id: userId,
+        is_pinned: !(post.is_pinned ?? false),
+      }),
+    })
+    if (response.ok) {
+      await invalidate('app:journal')
+    } else {
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+      alert(`Failed to toggle pin: ${errorData.message}`)
+    }
+  }
 </script>
 
 <Loading {loading} />
@@ -188,7 +207,17 @@
         <div class="flex-grow-0 text-center" style="flex-basis: 30%;">
           <p><strong>{formatTimestamp(entry.created_at)}</strong></p>
         </div>
-        <div class="flex flex-grow justify-end space-x-2">
+        <div class="flex flex-grow items-center justify-end space-x-2">
+          <button
+            onclick={() => togglePin(entry)}
+            class="btn btn-ghost btn-sm"
+            title={entry.is_pinned ? 'Unpin' : 'Pin'}
+            aria-label={entry.is_pinned ? 'Unpin entry' : 'Pin entry'}
+          >
+            <i
+              class={`fas ${entry.is_pinned ? 'fa-thumbtack rotate-12 text-warning' : 'fa-thumbtack text-base-content/60'}`}
+            ></i>
+          </button>
           <button
             onclick={() => toggleEdit(entry)}
             class="btn btn-sm"

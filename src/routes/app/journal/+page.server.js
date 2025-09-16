@@ -18,6 +18,7 @@ export async function load({ params, locals, depends }) {
     .from('journal')
     .select('*')
     .eq('user_id', userId)
+    .order('is_pinned', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
 
   if (journalError) {
