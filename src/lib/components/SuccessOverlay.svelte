@@ -1,18 +1,24 @@
 <script>
+  import { fade } from 'svelte/transition'
   export let visible = false
   export let message = 'Saved!'
   export let subtext = 'Nice work. Keep it going.'
 </script>
 
 {#if visible}
-  <div class="celebration-overlay" role="img" aria-label="Success">
+  <div
+    class="celebration-overlay"
+    role="img"
+    aria-label="Success"
+    transition:fade={{ duration: 450 }}
+  >
     {#each Array(60) as _, i}
       <div
         class="confetti confetti-{i % 5}"
         style="
           left: {Math.random() * 100}%;
-          animation-delay: {Math.random() * 1.5}s;
-          animation-duration: {2.2 + Math.random() * 1}s;
+          animation-delay: {Math.random() * 1.2}s;
+          animation-duration: {1.8 + Math.random() * 0.8}s;
         "
       ></div>
     {/each}
@@ -67,7 +73,9 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    animation: celebrationBounce 800ms ease-out;
+    animation:
+      celebrationBounce 800ms ease-out,
+      fadeOutSoft 400ms ease-in 1600ms both;
   }
 
   .celebration-text {
@@ -287,6 +295,15 @@
     66% {
       transform: translateY(9px) rotate(240deg) scale(0.85);
       opacity: 0.85;
+    }
+  }
+
+  @keyframes fadeOutSoft {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
 </style>

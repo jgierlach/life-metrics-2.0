@@ -128,7 +128,7 @@
       // loading = false
       setTimeout(() => {
         showCelebration = false
-      }, 2200)
+      }, 2600)
     } else {
       const errorData = await response.json()
       alert(`Failed to create Journal: ${errorData.message}`)
