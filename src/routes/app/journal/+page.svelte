@@ -4,6 +4,7 @@
   import { formatTimestamp } from '$lib/utils'
   import Loading from '$lib/components/Loading.svelte'
   import { marked } from 'marked'
+  import SuccessOverlay from '$lib/components/SuccessOverlay.svelte'
 
   /** @typedef {{ id: string; created_at: string; content: string }} JournalEntry */
 
@@ -16,6 +17,23 @@
   let loading = $state(false)
   let entry = $state('')
   let showEntry = $state(true)
+  let showCelebration = $state(false)
+
+  // Safer markdown: disable image rendering and strip inline <img> tags
+  marked.use({
+    renderer: {
+      /** @param {any} token */
+      image(token) {
+        return `<span class=\"opacity-60 italic\">(image)</span>`
+      },
+    },
+  })
+
+  /** @param {string} text */
+  function renderMarkdown(text) {
+    const withoutImgTags = String(text || '').replace(/<img\b[^>]*>/gi, '')
+    return marked.parse(withoutImgTags)
+  }
 
   function toggleShowEntry() {
     showEntry = !showEntry
@@ -93,7 +111,7 @@
   }
 
   async function createEntry() {
-    loading = true
+    // loading = true
     const response = await fetch('/app/api/journal/create-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -103,11 +121,14 @@
       }),
     })
     if (response.ok) {
-      goto('/app/#top')
       toggleShowEntry()
+      showCelebration = true
       await invalidate('app:journal')
       entry = ''
-      loading = false
+      // loading = false
+      setTimeout(() => {
+        showCelebration = false
+      }, 2200)
     } else {
       const errorData = await response.json()
       alert(`Failed to create Journal: ${errorData.message}`)
@@ -138,22 +159,27 @@
           required
         ></textarea>
         <div class="mt-4 flex justify-center">
-          <button type="submit" class="btn btn-outline btn-info">Post</button>
+          <button type="submit" class="btn btn-outline btn-primary">Post</button>
         </div>
       </div>
     </form>
   </div>
 {:else}
   <div class="mt-4 flex justify-center">
-    <div transition:fade={{ duration: 500 }}>
-      <img src="/green-check-mark.png" class="h-32 w-32" alt="green check mark" />
-    </div>
+    <div transition:fade={{ duration: 500 }}></div>
   </div>
 {/if}
 
 {#if !showEntry}
   <div class="mb-96"></div>
 {/if}
+
+<!-- Success celebration overlay -->
+<SuccessOverlay
+  visible={showCelebration}
+  message="Journal saved!"
+  subtext="Nice work. Keep it going."
+/>
 
 {#each journal as entry}
   <div class="mt-6 flex justify-center">
@@ -190,7 +216,7 @@
         </div>
       {:else}
         <div class="prose mt-4" style="padding-left: 0.5rem; padding-right: 0.5rem;">
-          {@html marked(entry.content)}
+          {@html renderMarkdown(entry.content)}
         </div>
       {/if}
     </div>
