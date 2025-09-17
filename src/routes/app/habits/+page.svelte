@@ -7,7 +7,6 @@
 
   let { data } = $props()
   const habits = $derived(data.habits)
-  const session = $derived(data.session)
 
   /**
    * @typedef {Object} Habit
@@ -26,7 +25,7 @@
   /** @param {SubmitEvent} event */
   async function createHabit(event) {
     event.preventDefault()
-    const response = await fetch('/app/api/habits/createHabit', {
+    const response = await fetch('/app/api/habits/create-habit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,7 +55,7 @@
   /** @param {string | undefined} habitId @param {string | undefined} createdAt */
   async function deleteHabit(habitId, createdAt) {
     if (!habitId || !createdAt) return
-    const response = await fetch('/app/api/habits/deleteHabit', {
+    const response = await fetch('/app/api/habits/delete-habit', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -82,7 +81,7 @@
   async function editHabit() {
     const habitId = habitToEdit.habit_id
     const createdAt = habitToEdit.created_at
-    const response = await fetch('/app/api/habits/editHabit', {
+    const response = await fetch('/app/api/habits/edit-habit', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -123,7 +122,7 @@
     const completions = habitsCompletedToday.map((habit) => {
       return { habit_id: habit.habit_id, date_completed: selectedDate }
     })
-    const response = await fetch('/app/api/habits/submitCompletedHabits', {
+    const response = await fetch('/app/api/habits/submit-completed-habits', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -188,7 +187,7 @@
     }
 
     const response = await fetch(
-      `/app/api/habits/fetchHabitCompletionsCount?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`,
+      `/app/api/habits/fetch-habit-completions-count?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`,
       {
         method: 'GET',
         headers: {
@@ -241,7 +240,7 @@
     loading = true
 
     const response = await fetch(
-      `/app/api/habits/fetchHabitCompletionsCount?startDate=${encodeURIComponent(today)}&endDate=${encodeURIComponent(today)}`,
+      `/app/api/habits/fetch-habit-completions-count?startDate=${encodeURIComponent(today)}&endDate=${encodeURIComponent(today)}`,
     )
 
     if (response.ok) {
