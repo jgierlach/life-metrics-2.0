@@ -21,7 +21,8 @@
   const { data } = $props()
   /** @type {any[]} */
   const relationships = $derived(data.relationships)
-  const session = $derived(data.session)
+  // const session = $derived(data.session)
+  const userId = $derived(data?.session?.user?.id)
 
   // Execute onMount
   onMount(async () => {
@@ -186,12 +187,13 @@
       },
       body: JSON.stringify({
         name,
-        innerCircle,
-        phoneNumber,
+        inner_circle: innerCircle,
+        phone_number: phoneNumber,
         address,
         birthday,
         anniversary,
         notes,
+        user_id: userId,
       }),
     })
     if (response.ok) {
@@ -248,6 +250,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
+        user_id: userId,
       }),
     })
     if (response.ok) {
