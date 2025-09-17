@@ -754,10 +754,11 @@
     <h1 class="text-center text-2xl font-semibold">Select Date Range</h1>
     <div class="flex items-center space-x-4">
       <div class="form-control">
-        <label class="label">
+        <label class="label" for="startDate">
           <span class="label-text">Start Date</span>
         </label>
         <input
+          id="startDate"
           type="date"
           bind:value={startDate}
           class="input input-bordered"
@@ -765,10 +766,11 @@
         />
       </div>
       <div class="form-control">
-        <label class="label">
+        <label class="label" for="endDate">
           <span class="label-text">End Date</span>
         </label>
         <input
+          id="endDate"
           type="date"
           bind:value={endDate}
           class="input input-bordered"
@@ -856,7 +858,11 @@
 
       <div class="form-control mb-4">
         <label class="label" for="innerCircle">Inner Circle</label>
-        <select class="select select-bordered bg-base-200" bind:value={innerCircle}>
+        <select
+          id="innerCircle"
+          class="select select-bordered bg-base-200"
+          bind:value={innerCircle}
+        >
           <option value={true}>TRUE</option>
           <option value={false}>FALSE</option>
         </select>
@@ -868,7 +874,7 @@
           required
           class="input input-bordered bg-base-200"
           type="tel"
-          id="name"
+          id="phoneNumber"
           bind:value={phoneNumber}
           placeholder="Phone Number"
         />
@@ -880,7 +886,7 @@
           required
           class="input input-bordered bg-base-200"
           type="text"
-          id="name"
+          id="address"
           bind:value={address}
           placeholder="Address"
         />
@@ -950,7 +956,11 @@
 
       <div class="form-control mb-4">
         <label class="label" for="innerCircle">Inner Circle</label>
-        <select class="select select-bordered bg-base-200" bind:value={innerCircle}>
+        <select
+          id="innerCircle"
+          class="select select-bordered bg-base-200"
+          bind:value={innerCircle}
+        >
           <option value={true}>TRUE</option>
           <option value={false}>FALSE</option>
         </select>
@@ -962,7 +972,7 @@
           required
           class="input input-bordered bg-base-200"
           type="tel"
-          id="name"
+          id="phoneNumber"
           bind:value={phoneNumber}
           placeholder="Phone Number"
         />
@@ -974,7 +984,7 @@
           required
           class="input input-bordered bg-base-200"
           type="text"
-          id="name"
+          id="address"
           bind:value={address}
           placeholder="Address"
         />
@@ -1056,29 +1066,29 @@
 
     <div class="space-y-4">
       <div>
-        <label class="label font-semibold">Name</label>
+        <div class="label font-semibold">Name</div>
         <p class="text-base">{relationshipToShowNotes.name}</p>
       </div>
 
       <div>
-        <label class="label font-semibold">Phone Number</label>
+        <div class="label font-semibold">Phone Number</div>
         <p class="text-base">{relationshipToShowNotes.phone_number}</p>
       </div>
 
       <div>
-        <label class="label font-semibold">Address</label>
+        <div class="label font-semibold">Address</div>
         <p class="text-base">{relationshipToShowNotes.address}</p>
       </div>
 
       <div>
-        <label class="label font-semibold">Birthday</label>
+        <div class="label font-semibold">Birthday</div>
         <p class="text-base">
           {convertDateForRelationshipSection(relationshipToShowNotes.birthday)}
         </p>
       </div>
 
       <div>
-        <label class="label font-semibold">Anniversary</label>
+        <div class="label font-semibold">Anniversary</div>
         <p class="text-base">
           {relationshipToShowNotes.anniversary === null
             ? 'Nothing recorded'
@@ -1087,7 +1097,7 @@
       </div>
 
       <div>
-        <label class="label font-semibold">Date of Last Text</label>
+        <div class="label font-semibold">Date of Last Text</div>
         <p class="text-base">
           {relationshipToShowNotes.date_of_last_text === null
             ? 'Nothing recorded'
@@ -1096,7 +1106,7 @@
       </div>
 
       <div>
-        <label class="label font-semibold">Date of Last Phone Call</label>
+        <div class="label font-semibold">Date of Last Phone Call</div>
         <p class="text-base">
           {relationshipToShowNotes.date_of_last_phone_call === null
             ? 'Nothing recorded'
@@ -1105,7 +1115,7 @@
       </div>
 
       <div>
-        <label class="label font-semibold">Date of Last In Person</label>
+        <div class="label font-semibold">Date of Last In Person</div>
         <p class="text-base">
           {relationshipToShowNotes.date_of_last_in_person === null
             ? 'Nothing recorded'
@@ -1114,7 +1124,7 @@
       </div>
 
       <div>
-        <label class="label font-semibold">Notes</label>
+        <div class="label font-semibold">Notes</div>
         <p class="text-base">{relationshipToShowNotes.notes}</p>
       </div>
     </div>
