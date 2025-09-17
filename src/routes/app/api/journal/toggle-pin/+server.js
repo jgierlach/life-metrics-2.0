@@ -2,9 +2,14 @@ import { json } from '@sveltejs/kit'
 
 /** @type {import('./$types').RequestHandler} */
 export async function PUT({ request, locals }) {
-  const { id, user_id, is_pinned } = await request.json()
+  const { id, is_pinned } = await request.json()
+  const userId = locals.session?.user?.id
 
-  if (!id || !user_id || typeof is_pinned !== 'boolean') {
+  if (!userId) {
+    return json({ message: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!id || typeof is_pinned !== 'boolean') {
     return json({ message: 'Missing or invalid fields' }, { status: 400 })
   }
 
@@ -12,7 +17,7 @@ export async function PUT({ request, locals }) {
     .from('journal')
     .update({ is_pinned })
     .eq('id', id)
-    .eq('user_id', user_id)
+    .eq('user_id', userId)
 
   if (error) {
     console.error(error)

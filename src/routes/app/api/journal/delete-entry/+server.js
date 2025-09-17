@@ -2,20 +2,22 @@ import { json } from '@sveltejs/kit'
 
 /** @type {import('./$types').RequestHandler} */
 export async function DELETE({ request, locals }) {
-  const { id, user_id } = await request.json()
+  const { id } = await request.json()
+  const userId = locals.session?.user?.id
 
-  if (!id || !user_id) {
-    return json(
-      { message: 'Missing or invalid fields required to delete journal entry.' },
-      { status: 400 },
-    )
+  if (!userId) {
+    return json({ message: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!id) {
+    return json({ message: 'Missing entry id' }, { status: 400 })
   }
 
   const { error } = await locals.supabase
     .from('journal')
     .delete()
     .eq('id', id)
-    .eq('user_id', user_id)
+    .eq('user_id', userId)
 
   if (error) {
     console.error('Error deleting journal entry', error)

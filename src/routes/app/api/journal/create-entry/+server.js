@@ -2,19 +2,18 @@ import { json } from '@sveltejs/kit'
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, locals }) {
-  const { content, user_id } = await request.json()
+  const { content } = await request.json()
+  const userId = locals.session?.user?.id
 
-  if (!content || !user_id) {
-    return json(
-      { message: 'Missing or invalid fields required to create journal entry.' },
-      { status: 400 },
-    )
+  if (!userId) {
+    return json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const row = {
-    content,
-    user_id,
+  if (!content) {
+    return json({ message: 'Missing content' }, { status: 400 })
   }
+
+  const row = { content, user_id: userId }
 
   const { data, error } = await locals.supabase.from('journal').insert([row]).select()
 

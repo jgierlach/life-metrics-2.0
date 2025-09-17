@@ -10,9 +10,6 @@
 
   const { data } = $props()
   let journal = $derived(data?.journal ?? [])
-  let session = $derived(data?.session ?? null)
-
-  let userId = $derived(session?.user?.id ?? '')
 
   let loading = $state(false)
   let entry = $state('')
@@ -64,7 +61,6 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
-        user_id: userId,
         content: entryEditContent,
       }),
     })
@@ -96,7 +92,6 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
-        user_id: userId,
       }),
     })
     if (response.ok) {
@@ -117,7 +112,6 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         content: entry,
-        user_id: userId,
       }),
     })
     if (response.ok) {
@@ -142,7 +136,6 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id: post.id,
-        user_id: userId,
         is_pinned: !(post.is_pinned ?? false),
       }),
     })
