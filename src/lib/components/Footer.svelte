@@ -4,7 +4,7 @@
 
 <footer class="footer mt-8 flex flex-none bg-base-100 p-4">
   <div class="text-center">
-    <strong>{`Hometown Industries © ${currentYear} - All Rights Reserved.`}</strong>
+    <strong>{`Life Metrics © ${currentYear} - All Rights Reserved.`}</strong>
   </div>
 </footer>
 
