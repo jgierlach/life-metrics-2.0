@@ -244,7 +244,7 @@
           >
         </div>
       {:else}
-        <div class="prose mt-4" style="padding-left: 0.5rem; padding-right: 0.5rem;">
+        <div class="journal-prose prose mt-4" style="padding-left: 0.5rem; padding-right: 0.5rem;">
           {@html renderMarkdown(entry.content)}
         </div>
       {/if}
@@ -260,7 +260,7 @@
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
     <h1 class="text-center text-lg font-bold">Are you sure you want to delete this entry?</h1>
-    <div class="entry-content prose py-4" style="white-space: pre-line;">
+    <div class="entry-content journal-prose prose py-4" style="white-space: pre-line;">
       {#if entryToDelete}
         {@html renderMarkdown(entryToDelete.content)}
       {/if}
@@ -279,4 +279,25 @@
     aria-label="Close modal"
   ></button>
 </div>
+
 <!-- DELETE ENTRY MODAL ENDS -->
+
+<style>
+  /* Wrap long URLs and unbroken text inside rendered markdown (scoped) */
+  :global(.journal-prose) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  :global(.journal-prose a) {
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  /* Preserve normal wrapping in code blocks */
+  :global(.journal-prose code),
+  :global(.journal-prose pre) {
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+</style>
