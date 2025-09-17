@@ -39,14 +39,14 @@
   </div>
 
   <!-- Hero Section -->
-  <div class="from-primary/10 to-secondary/10 hero min-h-screen bg-green-50">
+  <div class="from-primary/10 to-secondary/10 hero min-h-[70vh] bg-green-50">
     <div class="hero-content text-center">
       <div class="max-w-4xl">
         {#if data.session}
-          <div class="mb-8">
+          <div class="mb-8 flex justify-center">
             <div
               role="status"
-              class="alert alert-success rounded-xl border border-success/20 bg-gradient-to-r from-emerald-50 to-green-50 shadow-md"
+              class="alert alert-success max-w-3xl rounded-xl border border-success/20 bg-base-100 shadow-md"
             >
               <svg
                 class="h-6 w-6 text-success"
