@@ -26,10 +26,10 @@
 
   // Execute onMount
   onMount(async () => {
-    // loading = true
-    await updateRelationshipInteractions()
-    await fetchRelationshipInteractionsCount()
-    await fetchRelationshipInteractionsByDay()
+    // Fire-and-forget update of latest interaction fields without blocking render
+    fetch('/app/api/relationships/update-latest-interactions', { method: 'POST' })
+      .then(() => invalidateAll())
+      .catch(() => {})
 
     // After loading, check for upcoming birthdays and anniversaries
     /** @type {string[]} */
@@ -56,7 +56,7 @@
   })
 
   /** @type {any[]} */
-  let relationshipInteractionsByDay = $state([])
+  let relationshipInteractionsByDay = $state(data.relationshipInteractionsByDay ?? [])
 
   /** @type {any[]} */
   const textInteractionsByDay = $derived(
@@ -102,25 +102,9 @@
   }
 
   // Component specific variables and business logic
-  async function updateRelationshipInteractions() {
-    const response = await fetch('/app/api/relationships/update-latest-interactions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (response.ok) {
-      console.log('Relationships updated successfully')
-      await invalidateAll()
-    } else {
-      const errorData = await response.json()
-      console.error(`Failed to update relationships: ${errorData.message}`)
-    }
-  }
 
   /** @type {any[]} */
-  let relationshipInteractionsCount = $state([])
+  let relationshipInteractionsCount = $state(data.relationshipInteractionsCount ?? [])
 
   /** @type {any[]} */
   const relationShipInteractionsCountGreatestToLeast = $derived(
@@ -292,7 +276,6 @@
       return
     }
     const data = {
-      user_id: userId,
       relationship_name: interaction.name,
       relationship_id: interaction.id,
       interaction_type: '',
@@ -324,19 +307,17 @@
       const errorData = await response.json()
       alert(`Failed to submit relationship interactions: ${errorData.message}`)
     }
-    await updateRelationshipInteractions()
+    await invalidateAll()
     await fetchRelationshipInteractionsCount()
     await fetchRelationshipInteractionsByDay()
     loading = false
   }
 
   const now = new Date()
-  const currentYear = now.getFullYear()
-  const currentMonth = now.getMonth()
-  let startDate = $state(formatDate(new Date(currentYear, currentMonth, 1)))
-  let endDate = $state(formatDate(now))
+  let startDate = $state(data.startDate)
+  let endDate = $state(data.endDate)
 
-  let selectedDate = $state(formatDate(now))
+  let selectedDate = $state(data.selectedDate)
 
   async function yearToDate() {
     const now = new Date()

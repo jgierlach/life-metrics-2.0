@@ -8,6 +8,7 @@
   import { onMount } from 'svelte'
   import { invalidate } from '$app/navigation'
   import { page } from '$app/stores'
+  import { beforeNavigate, afterNavigate } from '$app/navigation'
 
   let { data, children } = $props()
 
@@ -21,6 +22,9 @@
   // Determine if we are on an app route (e.g., /app or any sub-route)
   let isAppRoute = $derived(($page.url.pathname || '/').startsWith('/app'))
 
+  // Navigation loading indicator state (replaces deprecated $navigating)
+  let isNavigating = $state(false)
+
   onMount(() => {
     // Set initial sidebar state based on screen size
     // Desktop: open by default, Mobile: closed by default
@@ -30,6 +34,13 @@
       if (newSession?.expires_at !== session?.expires_at) {
         invalidate('supabase:auth')
       }
+    })
+
+    beforeNavigate(() => {
+      isNavigating = true
+    })
+    afterNavigate(() => {
+      isNavigating = false
     })
 
     return () => data.subscription.unsubscribe()
@@ -63,6 +74,11 @@
           ? 'lg:ml-64'
           : 'lg:ml-0'}"
       >
+        {#if isNavigating}
+          <div class="fixed left-0 top-0 z-50 h-1 w-full">
+            <div class="bg-primary h-full w-0 animate-[loadbar_1.2s_ease-in-out_infinite]"></div>
+          </div>
+        {/if}
         <div class="min-h-screen p-4 {!menuOpen ? 'pt-16' : ''}">
           {@render children?.()}
         </div>
