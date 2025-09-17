@@ -21,8 +21,6 @@
   const { data } = $props()
   /** @type {any[]} */
   const relationships = $derived(data.relationships)
-  // const session = $derived(data.session)
-  const userId = $derived(data?.session?.user?.id)
 
   // Execute onMount
   onMount(async () => {
