@@ -848,7 +848,7 @@
     <h1 class="mb-5 text-center text-xl font-semibold">Create Relationship</h1>
     <form onsubmit={createRelationship}>
       <div class="form-control mb-4">
-        <label class="label" for="name">Name</label>
+        <label class="label" for="name">Name (required)</label>
         <input
           required
           class="input input-bordered bg-base-200"
@@ -860,7 +860,7 @@
       </div>
 
       <div class="form-control mb-4">
-        <label class="label" for="innerCircle">Inner Circle</label>
+        <label class="label" for="innerCircle">Inner Circle (required)</label>
         <select
           id="innerCircle"
           class="select select-bordered bg-base-200"
@@ -872,7 +872,7 @@
       </div>
 
       <div class="form-control mb-4">
-        <label class="label" for="phoneNumber">Phone Number</label>
+        <label class="label" for="phoneNumber">Phone Number (required)</label>
         <input
           required
           class="input input-bordered bg-base-200"
@@ -886,7 +886,6 @@
       <div class="form-control mb-4">
         <label class="label" for="address">Address</label>
         <input
-          required
           class="input input-bordered bg-base-200"
           type="text"
           id="address"
@@ -896,7 +895,7 @@
       </div>
 
       <div class="form-control mb-4">
-        <label class="label" for="birthday">Birthday</label>
+        <label class="label" for="birthday">Birthday (required)</label>
         <input
           required
           class="input input-bordered bg-base-200"
