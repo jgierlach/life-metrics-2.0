@@ -81,7 +81,6 @@
     loading = true
     const params = new URLSearchParams()
     params.set('selectedDate', selectedDate)
-    if (userId) params.set('userId', userId)
     const response = await fetch(
       `/app/api/relationships/fetch-relationship-interactions-by-day?${params.toString()}`,
       {
@@ -109,9 +108,6 @@
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        supabase: data.supabase, // Pass the Supabase client instance
-      }),
     })
 
     if (response.ok) {
@@ -196,7 +192,6 @@
         birthday,
         anniversary,
         notes,
-        user_id: userId,
       }),
     })
     if (response.ok) {
@@ -229,7 +224,6 @@
         birthday,
         anniversary,
         notes,
-        user_id: userId,
       }),
     })
     if (response.ok) {
@@ -254,7 +248,6 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
-        user_id: userId,
       }),
     })
     if (response.ok) {

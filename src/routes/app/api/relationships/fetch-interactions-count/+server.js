@@ -2,6 +2,10 @@ import { json } from '@sveltejs/kit'
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url, locals }) {
+  const userId = locals.session?.user?.id
+  if (!userId) {
+    return json({ message: 'Unauthorized' }, { status: 401 })
+  }
   const startDate = url.searchParams.get('startDate')
   let endDate = url.searchParams.get('endDate')
 
@@ -20,6 +24,7 @@ export async function GET({ url, locals }) {
   const { data, error } = await locals.supabase
     .from('relationship_interactions')
     .select('relationship_name, interaction_type, relationship_id, created_at, date_of_interaction')
+    .eq('user_id', userId)
     .gte('date_of_interaction', startUTC)
     .lte('date_of_interaction', endUTC)
 

@@ -3,7 +3,10 @@ import { json } from '@sveltejs/kit'
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url, locals }) {
   const selectedDate = url.searchParams.get('selectedDate')
-  const userId = url.searchParams.get('userId')
+  const userId = locals.session?.user?.id
+  if (!userId) {
+    return json({ status: 401, body: { message: 'Unauthorized' } })
+  }
 
   console.log('SELECTED DATE ON SERVER', selectedDate)
 

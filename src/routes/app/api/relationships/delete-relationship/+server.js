@@ -2,13 +2,17 @@ import { json } from '@sveltejs/kit'
 
 /** @type {import('./$types').RequestHandler} */
 export async function DELETE({ request, locals }) {
-  const { id, user_id } = await request.json()
+  const userId = locals.session?.user?.id
+  if (!userId) {
+    return json({ message: 'Unauthorized' }, { status: 401 })
+  }
+  const { id } = await request.json()
 
   const { error } = await locals.supabase
     .from('relationships')
     .delete()
     .eq('id', id)
-    .eq('user_id', user_id)
+    .eq('user_id', userId)
 
   if (error) {
     console.error('Error deleting journal entry:', error)

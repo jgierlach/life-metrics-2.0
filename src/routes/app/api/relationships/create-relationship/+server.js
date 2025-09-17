@@ -2,7 +2,11 @@ import { json } from '@sveltejs/kit'
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, locals }) {
-  const { name, inner_circle, phone_number, address, birthday, anniversary, notes, user_id } =
+  const userId = locals.session?.user?.id
+  if (!userId) {
+    return json({ message: 'Unauthorized' }, { status: 401 })
+  }
+  const { name, inner_circle, phone_number, address, birthday, anniversary, notes } =
     await request.json()
 
   const row = {
@@ -16,7 +20,7 @@ export async function POST({ request, locals }) {
     date_of_last_phone_call: null,
     date_of_last_in_person: null,
     notes,
-    user_id,
+    user_id: userId,
   }
 
   const { data, error } = await locals.supabase.from('relationships').insert([row]).select()
