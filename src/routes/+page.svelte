@@ -106,7 +106,7 @@
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         <!-- Health & Biometrics -->
         <div class="card bg-base-200 shadow-lg transition-shadow hover:shadow-xl">
-          <div class="card-div">
+          <div class="card-body">
             <div class="bg-primary/10 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
               <svg
                 class="text-primary h-8 w-8"
