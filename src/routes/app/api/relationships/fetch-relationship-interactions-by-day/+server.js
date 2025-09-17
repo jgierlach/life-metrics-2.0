@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit'
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url, locals }) {
   const selectedDate = url.searchParams.get('selectedDate')
+  const userId = url.searchParams.get('userId')
 
   console.log('SELECTED DATE ON SERVER', selectedDate)
 
@@ -21,6 +22,7 @@ export async function GET({ url, locals }) {
   const { data, error } = await locals.supabase
     .from('relationship_interactions')
     .select('*')
+    .eq('user_id', userId)
     .gte('date_of_interaction', startUTC)
     .lte('date_of_interaction', endUTC)
 

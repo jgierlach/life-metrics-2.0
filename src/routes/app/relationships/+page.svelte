@@ -79,8 +79,11 @@
 
   async function fetchRelationshipInteractionsByDay() {
     loading = true
+    const params = new URLSearchParams()
+    params.set('selectedDate', selectedDate)
+    if (userId) params.set('userId', userId)
     const response = await fetch(
-      `/app/api/relationships/fetch-relationship-interactions-by-day?selectedDate=${encodeURIComponent(selectedDate)}`,
+      `/app/api/relationships/fetch-relationship-interactions-by-day?${params.toString()}`,
       {
         method: 'GET',
         headers: {
@@ -220,12 +223,13 @@
       body: JSON.stringify({
         id,
         name,
-        innerCircle,
-        phoneNumber,
+        inner_circle: innerCircle,
+        phone_number: phoneNumber,
         address,
         birthday,
         anniversary,
         notes,
+        user_id: userId,
       }),
     })
     if (response.ok) {
@@ -295,6 +299,7 @@
       return
     }
     const data = {
+      user_id: userId,
       relationship_name: interaction.name,
       relationship_id: interaction.id,
       interaction_type: '',
@@ -945,7 +950,7 @@
     <h1 class="mb-5 text-center text-xl font-semibold">Edit Relationship</h1>
     <form onsubmit={editRelationship}>
       <div class="form-control mb-4">
-        <label class="label" for="name">Name</label>
+        <label class="label" for="name">Name (required)</label>
         <input
           required
           class="input input-bordered bg-base-200"
@@ -957,7 +962,7 @@
       </div>
 
       <div class="form-control mb-4">
-        <label class="label" for="innerCircle">Inner Circle</label>
+        <label class="label" for="innerCircle">Inner Circle (required)</label>
         <select
           id="innerCircle"
           class="select select-bordered bg-base-200"
@@ -969,7 +974,7 @@
       </div>
 
       <div class="form-control mb-4">
-        <label class="label" for="phoneNumber">Phone Number</label>
+        <label class="label" for="phoneNumber">Phone Number (required)</label>
         <input
           required
           class="input input-bordered bg-base-200"
@@ -983,7 +988,6 @@
       <div class="form-control mb-4">
         <label class="label" for="address">Address</label>
         <input
-          required
           class="input input-bordered bg-base-200"
           type="text"
           id="address"
@@ -993,7 +997,7 @@
       </div>
 
       <div class="form-control mb-4">
-        <label class="label" for="birthday">Birthday</label>
+        <label class="label" for="birthday">Birthday (required)</label>
         <input
           required
           class="input input-bordered bg-base-200"
