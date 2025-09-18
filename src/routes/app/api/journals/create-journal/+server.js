@@ -16,7 +16,7 @@ export async function POST({ request, locals }) {
 
     const row = { content: content.trim(), user_id: userId }
 
-    const { error } = await locals.supabase.from('journal').insert([row])
+    const { error } = await locals.supabase.from('journals').insert([row])
 
     if (error) {
       console.error('Error creating journal entry', error)

@@ -15,7 +15,7 @@ export async function PUT({ request, locals }) {
     }
 
     const { error } = await locals.supabase
-      .from('journal')
+      .from('journals')
       .update({ is_pinned })
       .eq('id', id)
       .eq('user_id', userId)

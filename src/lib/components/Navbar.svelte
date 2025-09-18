@@ -3,6 +3,8 @@
   import { onMount } from 'svelte'
   // @ts-ignore - Virtual icon import
   import GgMenu from 'virtual:icons/gg/menu'
+  // @ts-ignore - Virtual icon import
+
   /**
    * @typedef {Object} Props
    * @property {boolean} [isUserLoggedIn]
@@ -117,7 +119,7 @@
           </a>
         </li>
         <li>
-          <a href="/app/journal" class:active={page.url.pathname === '/app/journal'}>
+          <a href="/app/journals" class:active={page.url.pathname === '/app/journals'}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-5 w-5"
@@ -139,7 +141,33 @@
                 d="M12 8h5M12 12h5M12 16h5"
               />
             </svg>
-            Journal
+            Journals
+          </a>
+        </li>
+        <li>
+          <a href="/app/writings" class:active={page.url.pathname === '/app/writings'}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16.862 3.487a2.25 2.25 0 013.182 3.182L9.085 17.628 5.25 18.75l1.122-3.835L16.862 3.487z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-3-3"
+              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 21h14" />
+            </svg>
+            Writings
           </a>
         </li>
         <li>
@@ -232,11 +260,11 @@
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-5 w-5"
-              fill="none"
               viewBox="0 0 24 24"
+              fill="none"
               stroke="currentColor"
             >
-              <circle cx="12" cy="12" r="3" stroke-width="2" fill="none" />
+              <circle cx="12" cy="12" r="3" stroke-width="2" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19v2" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h2" />
@@ -245,25 +273,25 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M5.6 5.6l1.4 1.4"
+                d="M5.636 5.636l1.414 1.414"
               />
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M17 17l1.4 1.4"
+                d="M18.364 18.364l-1.414-1.414"
               />
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M5.6 18.4L7 17"
+                d="M5.636 18.364l1.414-1.414"
               />
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M17 7l1.4-1.4"
+                d="M18.364 5.636l-1.414 1.414"
               />
             </svg>
             Settings

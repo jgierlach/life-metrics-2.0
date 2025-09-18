@@ -15,7 +15,7 @@ export async function DELETE({ request, locals }) {
     }
 
     const { error } = await locals.supabase
-      .from('journal')
+      .from('journals')
       .delete()
       .eq('id', id)
       .eq('user_id', userId)

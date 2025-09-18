@@ -2,7 +2,6 @@ import { error } from '@sveltejs/kit'
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params, locals, depends }) {
-  depends('app:journal')
   const { supabase } = locals
   const session = locals.session
   if (!session) {
@@ -14,22 +13,18 @@ export async function load({ params, locals, depends }) {
     throw error(400, 'User id is required')
   }
 
-  const { data: journalRows, error: journalError } = await supabase
-    .from('journal')
+  const { data: writingRows, error: writingError } = await supabase
+    .from('writings')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
-  if (journalError) {
-    throw error(500, 'Failed to fetch journal entries')
+  if (writingError) {
+    throw error(500, 'Failed to fetch writing')
   }
 
-  // Pinned first (is_pinned === true), then all others by created_at (already sorted)
-  const pinned = (journalRows || []).filter((j) => j.is_pinned === true)
-  const others = (journalRows || []).filter((j) => j.is_pinned !== true)
-
   return {
-    journal: [...pinned, ...others],
+    writings: writingRows,
     session: locals.session,
   }
 }

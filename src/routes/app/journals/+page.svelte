@@ -9,7 +9,7 @@
   /** @typedef {{ id: string; created_at: string; content: string; is_pinned?: boolean | null }} JournalEntry */
 
   const { data } = $props()
-  let journal = $derived(data?.journal ?? [])
+  let journals = $derived(data?.journals ?? [])
 
   let loading = $state(false)
   let entry = $state('')
@@ -39,16 +39,16 @@
     }, 2000)
   }
 
-  let entryToEdit = $state(/** @type {JournalEntry | null} */ (null))
-  let entryEditContent = $state('')
+  let journalToEdit = $state(/** @type {JournalEntry | null} */ (null))
+  let journalToEditContent = $state('')
 
   /** @param {JournalEntry} post */
   function toggleEdit(post) {
-    if (entryToEdit && entryToEdit.id === post.id) {
-      entryToEdit = null
+    if (journalToEdit && journalToEdit.id === post.id) {
+      journalToEdit = null
     } else {
-      entryEditContent = post.content
-      entryToEdit = { ...post }
+      journalToEditContent = post.content
+      journalToEdit = { ...post }
     }
   }
 
@@ -56,18 +56,18 @@
   async function editJournal(post) {
     loading = true
     const id = post.id
-    const response = await fetch('/app/api/journal/edit-entry', {
+    const response = await fetch('/app/api/journals/edit-journal', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
-        content: entryEditContent,
+        content: journalToEditContent,
       }),
     })
     if (response.ok) {
-      await invalidate('app:journal')
+      await invalidateAll()
       toggleEdit(post)
-      entryEditContent = ''
+      journalToEditContent = ''
       loading = false
     } else {
       const errorData = await response.json()
@@ -75,19 +75,19 @@
     }
   }
 
-  let entryToDelete = $state(/** @type {JournalEntry | null} */ (null))
-  let showDeleteEntryModal = $state(false)
+  let journalToDelete = $state(/** @type {JournalEntry | null} */ (null))
+  let showDeleteJournalModal = $state(false)
 
   /** @param {JournalEntry} post */
   function toggleDelete(post) {
-    showDeleteEntryModal = !showDeleteEntryModal
-    entryToDelete = post
+    showDeleteJournalModal = !showDeleteJournalModal
+    journalToDelete = post
   }
 
   /** @param {string} id  */
-  async function deleteEntry(id) {
+  async function deleteJournal(id) {
     loading = true
-    const response = await fetch('/app/api/journal/delete-entry', {
+    const response = await fetch('/app/api/journals/delete-journal', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -95,19 +95,18 @@
       }),
     })
     if (response.ok) {
-      await invalidate('app:journal')
+      await invalidateAll()
       loading = false
     } else {
       const errorData = await response.json()
-      alert(`Failed to delete Journal: ${errorData.message}`)
+      alert(`Failed to delete Journals: ${errorData.message}`)
     }
-    entryToDelete = null
-    showDeleteEntryModal = false
+    journalToDelete = null
+    showDeleteJournalModal = false
   }
 
-  async function createEntry() {
-    // loading = true
-    const response = await fetch('/app/api/journal/create-entry', {
+  async function createJournal() {
+    const response = await fetch('/app/api/journals/create-journal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -117,9 +116,8 @@
     if (response.ok) {
       toggleShowEntry()
       showCelebration = true
-      await invalidate('app:journal')
+      await invalidateAll()
       entry = ''
-      // loading = false
       setTimeout(() => {
         showCelebration = false
       }, 2600)
@@ -131,7 +129,7 @@
 
   /** @param {JournalEntry} post */
   async function togglePin(post) {
-    const response = await fetch('/app/api/journal/toggle-pin', {
+    const response = await fetch('/app/api/journals/toggle-pin', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -140,7 +138,7 @@
       }),
     })
     if (response.ok) {
-      await invalidate('app:journal')
+      await invalidateAll()
     } else {
       const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
       alert(`Failed to toggle pin: ${errorData.message}`)
@@ -155,7 +153,7 @@
     <form
       onsubmit={(e) => {
         e.preventDefault()
-        createEntry()
+        createJournal()
       }}
       class="card mx-3 w-full max-w-md bg-base-100"
     >
@@ -193,81 +191,84 @@
   subtext="Nice work. Keep it going."
 />
 
-{#each journal as entry}
+{#each journals as journal}
   <div class="mt-6 flex justify-center">
     <div class="card mx-6 w-full max-w-lg bg-base-100 p-4">
       <div class="card-body">
         <div class="flex items-center justify-center gap-2">
           <button
-            onclick={() => toggleEdit(entry)}
+            onclick={() => toggleEdit(journal)}
             class="btn btn-sm"
             title="Edit"
-            aria-label="Edit entry"
+            aria-label="Edit journal"
           >
             <i class="fas fa-edit fa-xs"></i>
           </button>
           <button
-            onclick={() => toggleDelete(entry)}
+            onclick={() => toggleDelete(journal)}
             class="btn btn-error btn-sm"
             title="Delete"
-            aria-label="Delete entry"
+            aria-label="Delete journal"
           >
             <i class="fas fa-trash-alt fa-xs"></i>
           </button>
           <button
-            onclick={() => togglePin(entry)}
+            onclick={() => togglePin(journal)}
             class="btn btn-ghost btn-sm"
-            title={entry.is_pinned ? 'Unpin' : 'Pin'}
-            aria-label={entry.is_pinned ? 'Unpin entry' : 'Pin entry'}
+            title={journal.is_pinned ? 'Unpin' : 'Pin'}
+            aria-label={journal.is_pinned ? 'Unpin journal' : 'Pin journal'}
           >
             <i
-              class={`fas ${entry.is_pinned ? 'fa-thumbtack rotate-12 text-warning' : 'fa-thumbtack text-base-content/60'}`}
+              class={`fas ${journal.is_pinned ? 'fa-thumbtack rotate-12 text-warning' : 'fa-thumbtack text-base-content/60'}`}
             ></i>
           </button>
         </div>
         <div class="mt-2 text-center">
-          <p class="font-semibold">{formatTimestamp(entry.created_at)}</p>
+          <p class="font-semibold">{formatTimestamp(journal.created_at)}</p>
         </div>
       </div>
-      {#if entryToEdit && entryToEdit.id === entry.id}
-        <textarea bind:value={entryEditContent} class="textarea textarea-bordered mt-2"></textarea>
+      {#if journalToEdit && journalToEdit.id === journal.id}
+        <textarea bind:value={journalToEditContent} class="textarea textarea-bordered mt-2"
+        ></textarea>
         <div class="mt-5 flex justify-center">
-          <button onclick={() => editJournal(entry)} class="btn btn-outline btn-info btn-sm"
+          <button onclick={() => editJournal(journal)} class="btn btn-outline btn-primary btn-sm"
             >Save</button
           >
         </div>
       {:else}
         <div class="journal-prose prose mt-4" style="padding-left: 0.5rem; padding-right: 0.5rem;">
-          {@html renderMarkdown(entry.content)}
+          {@html renderMarkdown(journal.content)}
         </div>
       {/if}
     </div>
   </div>
 {/each}
 
-<!-- DELETE ENTRY MODAL BEGINS -->
-<div class={showDeleteEntryModal ? 'modal modal-open' : 'modal'}>
+<!-- DELETE journal MODAL BEGINS -->
+<div class={showDeleteJournalModal ? 'modal modal-open' : 'modal'}>
   <div class="modal-box">
     <button
-      onclick={() => (showDeleteEntryModal = false)}
+      onclick={() => (showDeleteJournalModal = false)}
       class="btn btn-circle btn-sm absolute right-2 top-2">✕</button
     >
-    <h1 class="text-center text-lg font-bold">Are you sure you want to delete this entry?</h1>
+    <h1 class="text-center text-lg font-bold">
+      Are you sure you want to delete this journal entry?
+    </h1>
     <div class="entry-content journal-prose prose py-4" style="white-space: pre-line;">
-      {#if entryToDelete}
-        {@html renderMarkdown(entryToDelete.content)}
+      {#if journalToDelete}
+        {@html renderMarkdown(journalToDelete.content)}
       {/if}
     </div>
     <div class="flex justify-center">
       <button
-        onclick={() => entryToDelete && deleteEntry(entryToDelete.id)}
+        onclick={() => journalToDelete && deleteJournal(journalToDelete.id)}
         class="btn btn-error mt-4">Yes, Delete</button
       >
     </div>
   </div>
   <button
     type="button"
-    onclick={() => (showDeleteEntryModal = false)}
+    onclick={() => (showDeleteJournalModal = false)}
     class="modal-backdrop"
     aria-label="Close modal"
   ></button>

@@ -20,7 +20,7 @@ export async function PUT({ request, locals }) {
     const row = { content: content.trim() }
 
     const { error } = await locals.supabase
-      .from('journal')
+      .from('journals')
       .update(row)
       .eq('id', id)
       .eq('user_id', userId)
