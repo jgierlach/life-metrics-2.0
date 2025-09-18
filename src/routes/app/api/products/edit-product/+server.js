@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit'
-import { updateChangelogOnEditProduct } from '$lib/utils'
+// import { updateChangelogOnEditProduct } from '$lib/utils'
 
 export async function PUT({ request, locals }) {
   try {
@@ -51,16 +51,16 @@ export async function PUT({ request, locals }) {
     }
 
     // Update inventory changelog if necessary
-    await updateChangelogOnEditProduct(
-      locals.supabase,
-      id,
-      quantity,
-      image_url,
-      brand_id,
-      brand_name,
-      name,
-      sku,
-    )
+    // await updateChangelogOnEditProduct(
+    //   locals.supabase,
+    //   id,
+    //   quantity,
+    //   image_url,
+    //   brand_id,
+    //   brand_name,
+    //   name,
+    //   sku,
+    // )
 
     const { data, error } = await locals.supabase
       .from('products')
