@@ -1,6 +1,6 @@
 <script>
-  import { onMount, onDestroy } from 'svelte'
-  import { goto, invalidateAll } from '$app/navigation'
+  import { onMount } from 'svelte'
+  import { goto } from '$app/navigation'
   import { marked } from 'marked'
   import Loading from '$lib/components/Loading.svelte'
 
@@ -45,13 +45,12 @@
       body: JSON.stringify({
         id,
         title,
-        writingDraft,
+        writing_draft: writingDraft,
       }),
     })
     if (response.ok) {
       console.log('WRITING SAVED')
       isSaved = true
-      await invalidateAll()
       setTimeout(() => {
         isSaved = false
       }, 1000)
@@ -69,13 +68,12 @@
       body: JSON.stringify({
         id,
         title,
-        writingDraft,
+        writing_draft: writingDraft,
       }),
     })
     if (response.ok) {
       console.log('WRITING SAVED')
       isSaved = true
-      await invalidateAll()
       setTimeout(() => {
         isSaved = false
       }, 1000)
@@ -103,10 +101,7 @@
     }
   }
 
-  function updateTitle(event) {
-    title = event.target.innerText
-  }
-
+  /** @param {KeyboardEvent} event */
   function handleKeydown(event) {
     if (event.ctrlKey) {
       switch (event.key) {
@@ -138,10 +133,6 @@
       window.clearInterval(autoSaveInterval)
     }
   })
-
-  onDestroy(() => {
-    window.clearInterval(autoSaveInterval)
-  })
 </script>
 
 <Loading {loading} />
@@ -154,7 +145,11 @@
     <div class="flex-1 text-left"></div>
   {/if}
   <div class="flex-1 text-center">
-    <h1 class="text-3xl font-bold" contenteditable={isEditMode} oninput={updateTitle}>{title}</h1>
+    {#if isEditMode}
+      <h1 class="text-3xl font-bold" contenteditable bind:textContent={title}></h1>
+    {:else}
+      <h1 class="text-3xl font-bold">{title}</h1>
+    {/if}
   </div>
   <div class="flex-1 text-right">
     {#if isEditMode}
@@ -210,7 +205,7 @@
     height: calc(100vh - 6rem); /* Adjust height based on navbar and padding */
   }
 
-  h1[contenteditable='true'] {
+  h1[contenteditable] {
     outline: none; /* Remove the default outline when focused */
   }
 </style>

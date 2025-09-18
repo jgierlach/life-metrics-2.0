@@ -76,7 +76,6 @@
   )
 
   async function fetchRelationshipInteractionsByDay() {
-    loading = true
     const params = new URLSearchParams()
     params.set('selectedDate', selectedDate)
     const response = await fetch(
@@ -96,7 +95,6 @@
       const errorData = await response.json()
       alert(`Failed to fetch relationship interactions by day ${errorData.message}`)
     }
-    loading = false
   }
 
   // Component specific variables and business logic
@@ -283,7 +281,6 @@
   }
 
   async function submitInteractions() {
-    loading = true
     if (interactions[0]?.interaction_type === '') {
       alert('You must select an interaction type.')
       return
@@ -308,7 +305,6 @@
     await invalidateAll()
     await fetchRelationshipInteractionsCount()
     await fetchRelationshipInteractionsByDay()
-    loading = false
   }
 
   const now = new Date()
