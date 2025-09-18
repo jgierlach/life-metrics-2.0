@@ -4,6 +4,8 @@ export async function POST({ request, locals }) {
   try {
     const { title, writing_draft } = await request.json()
 
+    console.log('ON SERVER', title, writing_draft)
+
     const userId = locals.session?.user?.id
     if (!userId) {
       return json({ message: 'Unauthorized' }, { status: 401 })
@@ -16,7 +18,11 @@ export async function POST({ request, locals }) {
       user_id: userId,
     }
 
-    const { data, error } = await locals.supabase.from('writings').insert([row]).select()
+    const { data: writing, error } = await locals.supabase
+      .from('writings')
+      .insert([row])
+      .select()
+      .single()
 
     if (error) {
       console.error('Supabase error creating new writing', error)
@@ -28,7 +34,7 @@ export async function POST({ request, locals }) {
 
     return json({
       status: 200,
-      body: { message: 'Writing created!', writing: data[0] },
+      body: { message: 'Writing created!', writing },
     })
   } catch (err) {
     console.error('Server error creating new writing', err)
