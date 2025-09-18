@@ -209,9 +209,7 @@
   let loading = $state(false)
 
   async function updateData() {
-    // loading = true
     await Promise.all([fetchCompletionsCount(), fetchTodayCompletions()])
-    // loading = false
   }
 
   async function yearToDate() {
