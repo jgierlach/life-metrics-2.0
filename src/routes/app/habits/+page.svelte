@@ -210,8 +210,7 @@
 
   async function updateData() {
     loading = true
-    await fetchCompletionsCount()
-    await fetchTodayCompletions()
+    await Promise.all([fetchCompletionsCount(), fetchTodayCompletions()])
     loading = false
   }
 
@@ -237,7 +236,6 @@
   // Fetch completions for today
   async function fetchTodayCompletions() {
     const today = formatDate(new Date())
-    loading = true
 
     const response = await fetch(
       `/app/api/habits/fetch-habit-completions-count?startDate=${encodeURIComponent(today)}&endDate=${encodeURIComponent(today)}`,
@@ -250,7 +248,6 @@
     } else {
       completionsToday = [] // Fallback in case of failure
     }
-    loading = false
   }
 
   let selectedDate = $state(formatDate(now))
@@ -267,7 +264,6 @@
   $effect(() => {
     void (async () => {
       await updateData()
-      await fetchTodayCompletions()
     })()
   })
 </script>
