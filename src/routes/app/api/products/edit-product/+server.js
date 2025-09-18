@@ -25,6 +25,10 @@ export async function PUT({ request, locals }) {
       notes,
     } = await request.json()
 
+    if (!id) {
+      return json({ message: 'id is required' }, { status: 400 })
+    }
+
     const product = {
       is_3pl_customer_product,
       image_url,

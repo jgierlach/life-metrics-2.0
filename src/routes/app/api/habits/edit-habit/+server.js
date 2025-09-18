@@ -1,35 +1,47 @@
 import { json } from '@sveltejs/kit'
 
-export async function PUT({ request, locals }) {
-  const { habitId, createdAt, habitName, description } = await request.json()
+/** @type {import('./$types').RequestHandler} */
+export async function PUT(event) {
+  const { request, locals } = event
+  try {
+    const { habitId, createdAt, habitName, description = '' } = await request.json()
 
-  console.log('EDIT HABIT', habitId, createdAt, habitName, description)
+    const userId = locals.session?.user?.id
+    if (!userId) {
+      return json({ message: 'Unauthorized' }, { status: 401 })
+    }
 
-  const userId = locals.session?.user?.id
-  if (!userId) {
-    return json({ message: 'Unauthorized' }, { status: 401 })
+    if (!habitId) {
+      return json({ message: 'habitId is required' }, { status: 400 })
+    }
+    if (!habitName || typeof habitName !== 'string' || habitName.trim().length === 0) {
+      return json({ message: 'habitName is required' }, { status: 400 })
+    }
+
+    const row = {
+      habit_id: habitId,
+      created_at: createdAt ?? undefined,
+      habit_name: habitName.trim(),
+      description,
+    }
+
+    const { error } = await locals.supabase
+      .from('habits')
+      .update(row)
+      .eq('habit_id', habitId)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('Error editing habit:', error)
+      return json({ message: 'Failed to edit habit' }, { status: 500 })
+    }
+
+    return json({
+      status: 200,
+      body: { message: 'Habit was edited' },
+    })
+  } catch (err) {
+    console.error('Unexpected error editing habit:', err)
+    return json({ message: 'Invalid request body' }, { status: 400 })
   }
-
-  const row = {
-    habit_id: habitId,
-    created_at: createdAt,
-    habit_name: habitName,
-    description: description,
-  }
-
-  const { data, error } = await locals.supabase
-    .from('habits')
-    .update(row)
-    .eq('habit_id', habitId)
-    .eq('user_id', userId)
-    .select()
-
-  if (error) {
-    console.error(error)
-  }
-
-  return json({
-    status: 200,
-    body: { message: 'Habit was edited' },
-  })
 }

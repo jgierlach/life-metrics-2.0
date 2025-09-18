@@ -4,6 +4,10 @@ export async function PUT({ request, locals }) {
   try {
     const { brand_name, brand_id } = await request.json()
 
+    if (!brand_name || !brand_id) {
+      return json({ message: 'brand_name and brand_id are required' }, { status: 400 })
+    }
+
     const row = { projected_po_quantity: 0 }
 
     const { data, error } = await locals.supabase
@@ -17,7 +21,7 @@ export async function PUT({ request, locals }) {
       console.error('Supabase editing product error', error)
       return json({
         status: 500,
-        body: { message: 'Failed to edit product', error },
+        body: { message: 'Failed to edit product' },
       })
     }
 
