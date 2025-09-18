@@ -13,6 +13,7 @@
     required = true,
     onClick = null,
     onSubmit = null,
+    onUpdated = null,
   } = $props()
 
   let isLoading = $state(false)
@@ -28,6 +29,7 @@
       return async ({ update }) => {
         isLoading = false
         update()
+        onUpdated?.()
       }
     }}
   >
@@ -43,7 +45,7 @@
         {id}
         {placeholder}
         {required}
-        {defaultValue}
+        value={defaultValue}
         name={id}
         class="input input-bordered w-full bg-base-200"
         readonly={onClick ? true : false}

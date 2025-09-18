@@ -1,35 +1,40 @@
 <script>
+  let { data } = $props()
+  const { user, session } = data
   import UpdateField from './components/UpdateField.svelte'
-  import ConfirmDeleteModal from './components/ConfirmDeleteModal.svelte'
   import UpdateUserPasswordModal from './components/UpdateUserPasswordModal.svelte'
+  import ConfirmDeleteModal from './components/ConfirmDeleteModal.svelte'
+  import SuccessOverlay from '$lib/components/SuccessOverlay.svelte'
+  import { enhance } from '$app/forms'
 
-  let showUpdatePasswordModal = $state(false)
-  let showDeleteUserModal = $state(false)
+  let showPasswordModal = $state(false)
+  let showDeleteModal = $state(false)
+  let showSuccess = $state(false)
+  let serverMessage = $state('')
 
-  let { form = $bindable(), data } = $props()
+  // User fields
+  let name = $state(user?.name)
+  let email = $state(user?.email)
+  let phoneNumber = $state(user?.phone_number)
+  let password = $state(user?.password)
+  let creditCardsUrl = $state(user?.credit_cards_url)
+  let assetsUrl = $state(user?.assets_url)
+  let debtsUrl = $state(user?.debts_url)
+  let taxReturnsUrl = $state(user?.tax_returns_url)
+  let transactionsUrl = $state(user?.transactions_url)
+  let categoriesUrl = $state(user?.categories_url)
 
-  let { session } = $derived(data)
-  let userName = $derived(session?.user?.user_metadata?.name ?? '')
-  let userEmail = $derived(session?.user?.email ?? '')
-  let userPhone = $derived(session?.user?.phone ?? '')
-  let message = $derived(form?.message ?? '')
-  let serverData = $derived(form?.data ?? {})
   /**
-   * @type {Record<string, string>}
+   * @param {{ update: () => Promise<void>, result: { type?: string, data?: any } }} args
    */
-  let errors = $derived(
-    Object.keys(serverData).reduce((acc, key) => {
-      // @ts-ignore
-      if (serverData[key]) {
-        // @ts-ignore
-        acc[key] = message
-      }
-      return acc
-    }, {}),
-  )
-
-  const handleResetForm = () => {
-    form = null
+  const afterSubmit = async (args) => {
+    const { update, result } = args
+    showSuccess = result?.type !== 'failure'
+    serverMessage = result?.data?.message || ''
+    await update()
+    if (showSuccess) {
+      setTimeout(() => (showSuccess = false), 1400)
+    }
   }
 </script>
 
@@ -37,86 +42,143 @@
   <title>Settings</title>
 </svelte:head>
 
-<!-- Page Layout -->
-<div class="container mx-auto max-w-3xl p-4 sm:p-6 lg:p-12">
-  <!-- Card Wrapper -->
-  <div class="card bg-base-100 shadow-xl">
-    <div class="card-body">
-      <h2 class="card-title text-2xl font-semibold">Settings</h2>
+<SuccessOverlay visible={showSuccess} message="Saved!" subtext="Your settings were updated." />
 
-      <!-- Name Section -->
+<div class="mx-auto max-w-3xl px-4 py-6">
+  <h1 class="mb-6 text-3xl font-bold">Account Settings</h1>
+
+  <section class="mb-10 rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
+    <h2 class="mb-4 text-xl font-semibold">Profile</h2>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <UpdateField
         id="userName"
-        placeholder="Enter your name"
-        formAction="updateUserDetails"
         label="Name"
-        defaultValue={userName}
-        error={errors.userName}
-        onSubmit={handleResetForm}
+        placeholder="Your name"
+        defaultValue={name}
+        formAction="updateUserDetails"
+        onUpdated={() => (showSuccess = true)}
       />
-
-      <!-- Email Section -->
       <UpdateField
         id="userEmail"
         type="email"
-        placeholder="Enter your email"
+        label="Email"
+        placeholder="name@email.com"
+        defaultValue={email}
         formAction="updateUserDetails"
-        label="Email Address"
-        defaultValue={userEmail}
-        error={errors.userEmail}
-        onSubmit={handleResetForm}
+        onUpdated={() => (showSuccess = true)}
       />
-
-      <!-- Phone Number Section -->
       <UpdateField
         id="userPhone"
-        type="tel"
-        placeholder="Enter your phone number"
+        label="Phone"
+        placeholder="+11234567890"
+        defaultValue={phoneNumber}
         formAction="updateUserDetails"
-        label="Phone Number"
-        defaultValue={userPhone}
-        error={errors.userPhone}
-        onSubmit={handleResetForm}
+        onUpdated={() => (showSuccess = true)}
       />
-
-      <!-- Password Section -->
-      <UpdateField
-        id="userPassword"
-        type="password"
-        placeholder="Enter a new password"
-        required={false}
-        label="Password"
-        onClick={() => (showUpdatePasswordModal = !showUpdatePasswordModal)}
-      />
-
-      <!-- Divider -->
-      <div class="divider"></div>
-
-      <!-- Delete Account Section -->
-      <div class="mt-6 text-center">
-        <h3 class="text-lg font-semibold text-red-600">Danger Zone</h3>
-        <p class="mt-2 text-sm text-gray-600">
-          Deleting your account is a permanent action and cannot be undone.
-        </p>
-        <button
-          class="btn btn-error mt-4 w-full md:w-auto"
-          onclick={() => (showDeleteUserModal = !showDeleteUserModal)}
-        >
-          Delete Account
-        </button>
-      </div>
     </div>
-  </div>
+  </section>
+
+  <section class="mb-10 rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
+    <h2 class="mb-4 text-xl font-semibold">Security</h2>
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <p class="font-medium">Password</p>
+        <p class="text-sm opacity-70">Set a strong, unique password.</p>
+      </div>
+      <button class="btn btn-outline" onclick={() => (showPasswordModal = true)}
+        >Update Password</button
+      >
+    </div>
+  </section>
+
+  <section class="mb-10 rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
+    <h2 class="mb-4 text-xl font-semibold">Financial Docs</h2>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <UpdateField
+        id="creditCardsUrl"
+        label="Credit Cards URL"
+        placeholder="https://..."
+        defaultValue={creditCardsUrl}
+        formAction="updateUserDetails"
+        onUpdated={() => (showSuccess = true)}
+      />
+      <UpdateField
+        id="assetsUrl"
+        label="Assets URL"
+        placeholder="https://..."
+        defaultValue={assetsUrl}
+        formAction="updateUserDetails"
+        onUpdated={() => (showSuccess = true)}
+      />
+      <UpdateField
+        id="debtsUrl"
+        label="Debts URL"
+        placeholder="https://..."
+        defaultValue={debtsUrl}
+        formAction="updateUserDetails"
+        onUpdated={() => (showSuccess = true)}
+      />
+      <UpdateField
+        id="taxReturnsUrl"
+        label="Tax Returns URL"
+        placeholder="https://..."
+        defaultValue={taxReturnsUrl}
+        formAction="updateUserDetails"
+        onUpdated={() => (showSuccess = true)}
+      />
+      <UpdateField
+        id="transactionsUrl"
+        label="Transactions URL"
+        placeholder="https://..."
+        defaultValue={transactionsUrl}
+        formAction="updateUserDetails"
+        onUpdated={() => (showSuccess = true)}
+      />
+      <UpdateField
+        id="categoriesUrl"
+        label="Categories URL"
+        placeholder="https://..."
+        defaultValue={categoriesUrl}
+        formAction="updateUserDetails"
+        onUpdated={() => (showSuccess = true)}
+      />
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-error/40 bg-base-100 p-5 shadow-sm">
+    <h2 class="mb-4 text-xl font-semibold text-error">Danger Zone</h2>
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="font-medium">Delete Account</p>
+        <p class="text-sm opacity-70">This will permanently delete your account and data.</p>
+      </div>
+      <button class="btn btn-error" onclick={() => (showDeleteModal = true)}>Delete Account</button>
+    </div>
+    <form
+      method="POST"
+      action="?/deleteAccount"
+      use:enhance={() => afterSubmit}
+      class="hidden"
+    ></form>
+  </section>
 </div>
 
-<!-- DELETE USER MODAL BEGINS -->
-<ConfirmDeleteModal bind:isOpen={showDeleteUserModal} onClose={handleResetForm} />
-<!-- DELETE USER MODAL ENDS -->
-
-<!-- UPDATE PASSWORD MODAL BEGINS -->
 <UpdateUserPasswordModal
-  bind:isOpen={showUpdatePasswordModal}
-  error={errors.userPassword}
-  onClose={handleResetForm}
+  bind:isOpen={showPasswordModal}
+  onClose={() => (showPasswordModal = false)}
 />
-<!-- UPDATE PASSWORD MODAL ENDS -->
+
+<ConfirmDeleteModal
+  bind:isOpen={showDeleteModal}
+  onClose={() => (showDeleteModal = false)}
+  onConfirm={() => {
+    const el = document.querySelector('form[action*="deleteAccount"]')
+    if (el && el instanceof HTMLFormElement) {
+      if (typeof el.requestSubmit === 'function') {
+        el.requestSubmit()
+      } else {
+        el.submit()
+      }
+    }
+  }}
+/>

@@ -2,7 +2,7 @@
   import { linear } from 'svelte/easing'
   import { fade } from 'svelte/transition'
 
-  let { isOpen = $bindable(false), onClose = null } = $props()
+  let { isOpen = $bindable(false), onClose = null, onConfirm = null } = $props()
 
   const handleClose = () => {
     isOpen = false
@@ -61,7 +61,7 @@
         >
           Cancel
         </button>
-        <button class="btn btn-error px-6"> Yes, Delete </button>
+        <button onclick={onConfirm} class="btn btn-error px-6"> Yes, Delete </button>
       </div>
     </div>
     <!-- Backdrop -->
