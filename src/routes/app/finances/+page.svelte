@@ -102,7 +102,7 @@
 {/if}
 
 {#if selectedTab === 'Cash Flow'}
-  <CashFlow {selectedMonthAndYear} chaseChecking={0} {categories} {creditCards} />
+  <CashFlow {selectedMonthAndYear} chaseChecking={0} {categories} {creditCards} {transactions} />
 {/if}
 
 {#if selectedTab === 'Balance Sheet'}
@@ -110,13 +110,13 @@
 {/if}
 
 {#if selectedTab === 'Cost To Live'}
-  <CostToLive {selectedMonthAndYear} {categories} />
+  <CostToLive {selectedMonthAndYear} {categories} {transactions} />
 {/if}
 
-{#if selectedTab === 'Credit Card'}
+{#if selectedTab === 'Credit Cards'}
   <CreditCards {creditCards} />
 {/if}
 
 {#if selectedTab === 'Tax Returns'}
-  <TaxReturns />
+  <TaxReturns {taxReturns} />
 {/if}

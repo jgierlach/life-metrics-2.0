@@ -11,8 +11,7 @@
     findCategoryBudgetForSelectedMonth,
   } from '$lib/utils'
 
-  let { data } = $props()
-  const { transactions, categories, selectedMonthAndYear } = data
+  const { transactions, categories, selectedMonthAndYear } = $props()
 
   let monthTransactions = $derived(
     findTransactionsForSelectedMonth(transactions, selectedMonthAndYear),

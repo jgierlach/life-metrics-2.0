@@ -1,6 +1,5 @@
 <script>
-  let { data } = $props()
-  const taxReturns = data
+  let { taxReturns } = $props()
 </script>
 
 <div class="my-5 px-4">

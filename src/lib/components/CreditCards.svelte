@@ -5,7 +5,7 @@
     convertDollarSignStringToNumber,
   } from '$lib/utils'
 
-  export let creditCards
+  const { creditCards } = $props()
 </script>
 
 <div class="my-5 px-4">

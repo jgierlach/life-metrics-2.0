@@ -1,8 +1,7 @@
 <script>
   import { formatDollarValue, convertDollarSignStringToNumber } from '$lib/utils'
 
-  let { data } = $props()
-  const { assets, debts } = data
+  const { assets, debts } = $props()
 
   let totalAssets = $derived(
     assets

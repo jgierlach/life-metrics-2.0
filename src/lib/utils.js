@@ -290,6 +290,9 @@ export const findSelectedCategoryBudget = (
 }
 
 export const findTransactionsForSelectedMonth = (transactions, selectedMonthAndYear) => {
+  if (!Array.isArray(transactions) || !selectedMonthAndYear) {
+    return []
+  }
   return transactions.filter(
     (transaction) =>
       transaction.Month === selectedMonthAndYear &&
