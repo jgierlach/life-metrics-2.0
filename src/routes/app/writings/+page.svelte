@@ -80,7 +80,9 @@
         </p>
       </div>
       <div class="flex justify-end">
-        <button onclick={createWriting} class="btn btn-primary shadow-lg">New Writing</button>
+        <button onclick={createWriting} class="btn btn-primary w-full shadow-lg sm:w-auto"
+          >New Writing</button
+        >
       </div>
     </div>
 
@@ -99,7 +101,7 @@
     {:else}
       <div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div class="sm:col-span-2">
-          <label class="input input-bordered flex items-center gap-2">
+          <label class="input input-bordered flex w-full items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -144,7 +146,7 @@
           {#each getDisplayedWritings() as post}
             <a
               href={`/app/writings/${post.id}`}
-              class="card bg-base-100 shadow-md transition hover:shadow-xl"
+              class="card h-full bg-base-100 shadow-md transition duration-200 hover:shadow-xl active:scale-[.98]"
             >
               <div class="card-body">
                 <h3 class="card-title truncate text-lg font-semibold">
