@@ -116,7 +116,7 @@
           <div class="label"><span class="label-text">Name</span></div>
           <input
             name="userName"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="Your name"
             bind:value={name}
             oninput={() => (isProfileDirty = true)}
@@ -127,7 +127,7 @@
           <input
             name="userEmail"
             type="email"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="name@email.com"
             bind:value={email}
             oninput={() => (isProfileDirty = true)}
@@ -137,7 +137,7 @@
           <div class="label"><span class="label-text">Phone</span></div>
           <input
             name="userPhone"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="+11234567890"
             bind:value={phoneNumber}
             oninput={() => (isProfileDirty = true)}
@@ -160,7 +160,7 @@
           <div class="label"><span class="label-text">Credit Cards URL</span></div>
           <input
             name="creditCardsUrl"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="https://..."
             bind:value={creditCardsUrl}
             oninput={() => (isLinksDirty = true)}
@@ -170,7 +170,7 @@
           <div class="label"><span class="label-text">Assets URL</span></div>
           <input
             name="assetsUrl"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="https://..."
             bind:value={assetsUrl}
             oninput={() => (isLinksDirty = true)}
@@ -180,7 +180,7 @@
           <div class="label"><span class="label-text">Debts URL</span></div>
           <input
             name="debtsUrl"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="https://..."
             bind:value={debtsUrl}
             oninput={() => (isLinksDirty = true)}
@@ -190,7 +190,7 @@
           <div class="label"><span class="label-text">Tax Returns URL</span></div>
           <input
             name="taxReturnsUrl"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="https://..."
             bind:value={taxReturnsUrl}
             oninput={() => (isLinksDirty = true)}
@@ -200,7 +200,7 @@
           <div class="label"><span class="label-text">Transactions URL</span></div>
           <input
             name="transactionsUrl"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="https://..."
             bind:value={transactionsUrl}
             oninput={() => (isLinksDirty = true)}
@@ -210,7 +210,7 @@
           <div class="label"><span class="label-text">Categories URL</span></div>
           <input
             name="categoriesUrl"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-base-200"
             placeholder="https://..."
             bind:value={categoriesUrl}
             oninput={() => (isLinksDirty = true)}
@@ -238,7 +238,7 @@
         <input
           name="userPassword"
           type="password"
-          class="input input-bordered w-full"
+          class="input input-bordered w-full bg-base-200"
           placeholder="••••••••"
         />
       </label>
@@ -247,7 +247,7 @@
         <input
           name="userConfirmPassword"
           type="password"
-          class="input input-bordered w-full"
+          class="input input-bordered w-full bg-base-200"
           placeholder="••••••••"
         />
       </label>
