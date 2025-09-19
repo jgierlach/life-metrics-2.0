@@ -26,10 +26,19 @@
   async function toggleEditMode() {
     if (isEditMode) {
       window.clearInterval(autoSaveInterval)
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = ''
+        document.documentElement.style.overflow = ''
+      }
+      isEditMode = false
     } else {
       startAutoSave()
+      isEditMode = true
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = 'hidden'
+        document.documentElement.style.overflow = 'hidden'
+      }
     }
-    isEditMode = !isEditMode
   }
 
   let showDeleteWritingModal = $state(false)
@@ -60,6 +69,9 @@
       alert(`Failed to save writing changes: ${errorData.message}`)
     }
   }
+
+  /** @type {HTMLDivElement | null} */
+  let scrollContainerEl
 
   async function autoSaveChanges() {
     const response = await fetch('/app/api/writings/edit-writing', {
@@ -131,56 +143,69 @@
     return () => {
       window.removeEventListener('keydown', handleKeydown)
       window.clearInterval(autoSaveInterval)
+      // Ensure body scroll is restored on unmount
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = ''
+        document.documentElement.style.overflow = ''
+      }
     }
   })
 </script>
 
 <Loading {loading} />
 
-<!-- Navbar -->
-<nav class="flex items-center justify-between bg-base-200 p-4">
-  {#if isEditMode}
-    <div class="flex-1 text-left">{!isSaved ? 'Saving...' : 'Saved!!!'}</div>
-  {:else}
-    <div class="flex-1 text-left"></div>
-  {/if}
-  <div class="flex-1 text-center">
+<div class={`flex ${isEditMode ? 'h-[100dvh]' : 'min-h-[100dvh]'} flex-col`}>
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-10 flex h-16 items-center justify-between bg-base-200 p-4">
     {#if isEditMode}
-      <h1 class="text-3xl font-bold" contenteditable bind:textContent={title}></h1>
+      <div class="flex-1 text-left">{!isSaved ? 'Saving...' : 'Saved!!!'}</div>
     {:else}
-      <h1 class="text-3xl font-bold">{title}</h1>
+      <div class="flex-1 text-left"></div>
     {/if}
-  </div>
-  <div class="flex-1 text-right">
-    {#if isEditMode}
-      <button class="btn btn-outline btn-primary btn-sm mr-2" onclick={saveChanges}> Save </button>
-    {:else}
-      <button class="btn btn-outline btn-secondary btn-sm mr-2" onclick={toggleEditMode}>
-        Edit
-      </button>
-    {/if}
-    <button class="btn btn-outline btn-error btn-sm" onclick={toggleDeleteWritingModal}
-      >Delete</button
-    >
-  </div>
-</nav>
+    <div class="flex-1 text-center">
+      {#if isEditMode}
+        <h1 class="text-3xl font-bold" contenteditable bind:textContent={title}></h1>
+      {:else}
+        <h1 class="text-3xl font-bold">{title}</h1>
+      {/if}
+    </div>
+    <div class="flex-1 text-right">
+      {#if isEditMode}
+        <button class="btn btn-outline btn-primary btn-sm mr-2" onclick={saveChanges}>
+          Save
+        </button>
+      {:else}
+        <button class="btn btn-outline btn-secondary btn-sm mr-2" onclick={toggleEditMode}>
+          Edit
+        </button>
+      {/if}
+      <button class="btn btn-outline btn-error btn-sm" onclick={toggleDeleteWritingModal}
+        >Delete</button
+      >
+    </div>
+  </nav>
 
-<!-- Content -->
-<div class="bg-base-200 p-6">
-  {#if isEditMode}
-    <div class="form-control px-2">
-      <textarea
-        class="h-full w-full resize-none border-none bg-transparent p-4 pl-64 pr-64 outline-none"
-        bind:value={writingDraft}
-      ></textarea>
-    </div>
-  {:else}
-    <div class="flex justify-center">
-      <div class="prose mt-4 px-2">
-        {@html marked(writingDraft)}
+  <!-- Content -->
+  <div
+    bind:this={scrollContainerEl}
+    class={`${isEditMode ? 'editor-scroll min-h-0 overflow-auto' : 'overflow-visible'} flex-1 bg-base-200`}
+  >
+    {#if isEditMode}
+      <div class="mx-auto max-w-[800px] px-4 sm:px-6 lg:px-8">
+        <div
+          contenteditable
+          bind:textContent={writingDraft}
+          class="w-full whitespace-pre-wrap py-4 outline-none"
+        ></div>
       </div>
-    </div>
-  {/if}
+    {:else}
+      <div class="flex justify-center">
+        <div class="prose mx-auto mt-4 max-w-[800px] px-4 sm:px-6 lg:px-8">
+          {@html marked(writingDraft)}
+        </div>
+      </div>
+    {/if}
+  </div>
 </div>
 
 <!-- DELETE WRITING MODAL BEGINS -->
@@ -201,11 +226,12 @@
 <!-- DELETE WRITING MODAL ENDS -->
 
 <style>
-  .form-control {
-    height: calc(100vh - 6rem); /* Adjust height based on navbar and padding */
+  h1[contenteditable] {
+    outline: none;
   }
 
-  h1[contenteditable] {
-    outline: none; /* Remove the default outline when focused */
+  .editor-scroll {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 </style>
