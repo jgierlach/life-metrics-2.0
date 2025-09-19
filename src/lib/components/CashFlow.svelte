@@ -11,114 +11,85 @@
     convertDollarSignStringToNumber,
   } from '$lib/utils'
 
-  // Import OnMount
-  import { onMount } from 'svelte'
+  // let { data } = $props()
+  const { transactions, selectedMonthAndYear, chaseChecking, categories, creditCards } = $props()
 
-  // Import stores
-  import { transactions, loadTransactions } from '$lib/stores/transactions'
-
-  onMount(() => {
-    loadTransactions()
+  $effect(() => {
+    console.log('transactions in cashflow', transactions)
   })
 
   // Components
   import Loading from '$lib/components/Loading.svelte'
 
-  // Props
-  export let selectedMonthAndYear
-  export let chaseChecking
-  export let categories
-  export let creditCards
-
   // Total card balance from all credit cards
-  $: totalCreditCardBalance = creditCards.reduce((total, creditCard) => {
-    return total + convertDollarSignStringToNumber(creditCard['Card Balance'])
-  }, 0)
+  let totalCreditCardBalance = $derived(
+    creditCards.reduce((total, creditCard) => {
+      return total + convertDollarSignStringToNumber(creditCard['Card Balance'])
+    }, 0),
+  )
 
   // How much available cash there is to spend
-  $: currentNetCashBalance = chaseChecking - totalCreditCardBalance
+  let currentNetCashBalance = $derived(chaseChecking - totalCreditCardBalance)
 
-  let selectedCategory = ''
+  let selectedCategory = $state('')
 
   // All the transactions for the selected month and year
-  $: monthTransactions = findTransactionsForSelectedMonth($transactions, selectedMonthAndYear)
+  let monthTransactions = $derived(
+    findTransactionsForSelectedMonth(transactions, selectedMonthAndYear),
+  )
 
   // All the transactions in a month that match the selected category
-  $: categoryTransactions = monthTransactions.filter((transaction) => {
-    if (selectedCategory === '') {
-      return transaction
-    }
-    return transaction.Category === selectedCategory
-  })
+  let categoryTransactions = $derived(
+    monthTransactions.filter((transaction) => {
+      if (selectedCategory === '') {
+        return transaction
+      }
+      return transaction.Category === selectedCategory
+    }),
+  )
 
   // The value of all the transactions for a specific category in the selected month
-  $: categoryTransactionsValue = categoryTransactions.reduce((acc, transaction) => {
-    const amount = parseFloat(transaction.Amount.replace(/[$,]/g, ''))
-    return acc + amount
-  }, 0)
+  let categoryTransactionsValue = $derived(
+    categoryTransactions.reduce((acc, transaction) => {
+      const amount = parseFloat(transaction.Amount.replace(/[$,]/g, ''))
+      return acc + amount
+    }, 0),
+  )
 
   // Format the date based on selected month and year for category budget lookup
-  $: categoryDate = convertDateToFindCategoryBudget(selectedMonthAndYear)
+  let categoryDate = $derived(convertDateToFindCategoryBudget(selectedMonthAndYear))
 
   // Find the category object based on which category is selected
-  $: selectedCategoryObject = categories.find((category) => {
-    if (selectedCategory === '') {
-      return 0
-    }
-    return category.Category === selectedCategory
-  })
-
-  $: {
-    // console.log('SELECTED CATEGORY OBJECT', selectedCategoryObject)
-    // console.log('CATEGORY DATE', categoryDate)
-    console.log('Credit Cards', creditCards)
-    console.log('Total card balance', totalCreditCardBalance)
-  }
-
+  let selectedCategoryObject = $derived(
+    categories.find((category) => {
+      if (selectedCategory === '') {
+        return 0
+      }
+      return category.Category === selectedCategory
+    }),
+  )
   // Access the budget property on the selected category object
-  $: selectedCategoryBudget = findSelectedCategoryBudget(
-    selectedCategory,
-    categoryDate,
-    selectedCategoryObject,
+  let selectedCategoryBudget = $derived(
+    findSelectedCategoryBudget(selectedCategory, categoryDate, selectedCategoryObject),
   )
 
   // The difference between category budget and month's actual value
-  $: netCategoryDifference =
+  let netCategoryDifference = $derived(
     categoryTransactionsValue > 0
       ? categoryTransactionsValue - selectedCategoryBudget
-      : selectedCategoryBudget + categoryTransactionsValue
+      : selectedCategoryBudget + categoryTransactionsValue,
+  )
 
   // Number of transactions for the selected month and year
-  $: numberOfTransactions = monthTransactions.length
+  let numberOfTransactions = $derived(monthTransactions.length)
 
   // Cash flow for the selected month
-  $: cashFlow = calculateSelectedMonthCashflow(monthTransactions)
+  let cashFlow = $derived(calculateSelectedMonthCashflow(monthTransactions))
 
   // Net cash flow for the selected month
-  $: netCashFlow = cashFlow.cashIn + cashFlow.cashOut
+  let netCashFlow = $derived(cashFlow.cashIn + cashFlow.cashOut)
 
-  let loading = false
-
-  const updateTransactionCategory = async (transaction, newCategory) => {
-    loading = true
-    const transactionId = transaction['Transaction ID']
-    console.log('TRANSACTION ID', transactionId)
-    const response = await fetch('/app/api/updateTransactionCategory', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        newCategory,
-        transactionId,
-      }),
-    })
-    if (response.ok) {
-      loadTransactions()
-    } else {
-      const errorData = await response.json()
-      alert(`Failed to edit habit: ${errorData.message}`)
-    }
-    loading = false
-  }
+  let loading = $state(false)
 
   let hoveredTransactionId = null
   let timer
@@ -152,7 +123,9 @@
         Open Transactions Sheet
       </a>
 
-      <a class="btn btn-info btn-sm" on:click={() => loadTransactions()}>Load Transactions</a>
+      <a class="btn btn-info btn-sm" onclick={() => console.log('Load Transactions')}
+        >Load Transactions</a
+      >
     </div>
 
     <!-- Bank & Credit Card Balances -->
@@ -212,7 +185,7 @@
             class="btn btn-outline btn-info btn-sm {selectedCategory === category.Category
               ? 'btn-active'
               : ''}"
-            on:click={() => (selectedCategory = category.Category)}
+            onclick={() => (selectedCategory = category.Category)}
           >
             {category.Category}
           </button>
@@ -255,7 +228,7 @@
           </div>
 
           <div class="mt-4 flex justify-center">
-            <button on:click={() => (selectedCategory = '')} class="btn btn-warning btn-sm">
+            <button onclick={() => (selectedCategory = '')} class="btn btn-warning btn-sm">
               Reset
             </button>
           </div>
@@ -284,8 +257,12 @@
               <td>
                 <div
                   class="tooltip relative"
-                  on:mouseenter={() => handleMouseEnter(transaction['Full Description'])}
-                  on:mouseleave={handleMouseLeave}
+                  role="button"
+                  tabindex="0"
+                  onmouseenter={() => handleMouseEnter(transaction['Full Description'])}
+                  onmouseleave={handleMouseLeave}
+                  onfocus={() => handleMouseEnter(transaction['Full Description'])}
+                  onblur={handleMouseLeave}
                 >
                   {abbreviateString(transaction['Full Description'], 34)}...
                   {#if hoveredTransactionId === transaction['Full Description']}

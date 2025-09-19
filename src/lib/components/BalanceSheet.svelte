@@ -1,28 +1,32 @@
 <script>
   import { formatDollarValue, convertDollarSignStringToNumber } from '$lib/utils'
 
-  export let assets
-  export let debts
+  let { data } = $props()
+  const { assets, debts } = data
 
-  $: totalAssets = assets
-    .map((asset) => convertDollarSignStringToNumber(asset['Asset Amount']))
-    .reduce((accumulator, currentValue) => {
-      return accumulator + currentValue
-    }, 0)
+  let totalAssets = $derived(
+    assets
+      .map((asset) => convertDollarSignStringToNumber(asset['Asset Amount']))
+      .reduce((accumulator, currentValue) => {
+        return accumulator + currentValue
+      }, 0),
+  )
 
-  $: totalDebts = debts
-    .map((debt) => convertDollarSignStringToNumber(debt['Debt Amount']))
-    .reduce((accumulator, currentValue) => {
-      return accumulator + currentValue
-    }, 0)
+  let totalDebts = $derived(
+    debts
+      .map((debt) => convertDollarSignStringToNumber(debt['Debt Amount']))
+      .reduce((accumulator, currentValue) => {
+        return accumulator + currentValue
+      }, 0),
+  )
 
-  $: equity = totalAssets - totalDebts
+  let equity = $derived(totalAssets - totalDebts)
 
-  $: {
+  $effect(() => {
     console.log('DEBTS', debts)
     console.log('ASSETS', assets)
     console.log('TOTAL ASSETS', totalAssets)
-  }
+  })
 </script>
 
 <div class="mt-6 flex flex-wrap justify-center gap-6 px-4">

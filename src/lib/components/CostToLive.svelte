@@ -11,111 +11,117 @@
     findCategoryBudgetForSelectedMonth,
   } from '$lib/utils'
 
-  // Import OnMount
-  import { onMount } from 'svelte'
+  let { data } = $props()
+  const { transactions, categories, selectedMonthAndYear } = data
 
-  // Import stores
-  import { transactions, loadTransactions } from '$lib/stores/transactions'
-  import { loadCategories } from '$lib/stores/categories'
-
-  // Props
-  export let categories
-  export let selectedMonthAndYear
-
-  onMount(() => {
-    loadTransactions()
-  })
-
-  $: monthTransactions = findTransactionsForSelectedMonth($transactions, selectedMonthAndYear)
-
-  // Cash flow for the selected month
-  $: cashFlow = calculateSelectedMonthCashflow(monthTransactions)
-
-  // Pull cash leaving the account to get actual expenses for the month
-  $: actualExpensesForSelectedMonth = cashFlow.cashOut
-
-  $: actualIncomeForSelectedMonth = cashFlow.cashIn
-
-  $: actualCashFlowForSelectedMonth = actualIncomeForSelectedMonth + actualExpensesForSelectedMonth
-
-  $: categoryBudgetsForSelectedMonth = categories
-    .filter((category) => category.Category !== 'Paycheck')
-    .map((category) => {
-      if (selectedMonthAndYear === '') {
-        return []
-      }
-      return {
-        categoryName: category.Category,
-        categoryBudgetForMonth: convertDollarSignStringToNumber(
-          category[convertDateToFindCategoryBudget(selectedMonthAndYear)],
-        ),
-      }
-    })
-
-  $: transactionsByCategoryForSelectedMonth = categories
-    .map((category) => category.Category)
-    .map((categoryName) => {
-      const categoryTransactions = monthTransactions.filter(
-        (transaction) => transaction.Category === categoryName,
-      )
-      const actualCategorySpending = categoryTransactions.reduce((accumulator, transaction) => {
-        return accumulator + parseFloat(transaction.Amount.replace(/[$,]/g, ''))
-      }, 0)
-      const categoryBudget = findCategoryBudgetForSelectedMonth(
-        categoryName,
-        categoryBudgetsForSelectedMonth,
-      )
-      const budgetRemaining = categoryBudget + actualCategorySpending
-      return {
-        categoryTransactions: categoryTransactions,
-        categoryName: categoryName,
-        categoryBudget: categoryBudget,
-        actualCategorySpending: actualCategorySpending,
-        budgetRemaining: budgetRemaining,
-      }
-    })
-
-  $: discrectionaryCategoryBudgetsForSelectedMonth = transactionsByCategoryForSelectedMonth.filter(
-    (category) =>
-      category.categoryName === 'Restaurants' ||
-      category.categoryName === 'Gear & Clothing' ||
-      category.categoryName === 'Travel' ||
-      category.categoryName === 'Gas' ||
-      category.categoryName === 'Groceries' ||
-      category.categoryName === 'Entertainment',
+  let monthTransactions = $derived(
+    findTransactionsForSelectedMonth(transactions, selectedMonthAndYear),
   )
 
-  $: budgetedDiscretionarySpendForSelectedMonth = discrectionaryCategoryBudgetsForSelectedMonth
-    .map((category) => category.categoryBudget)
-    .reduce((total, current) => {
-      return total + current
-    }, 0)
+  // Cash flow for the selected month
+  let cashFlow = $derived(calculateSelectedMonthCashflow(monthTransactions))
 
-  $: actualDiscretionarySpendForSelectedMonth = discrectionaryCategoryBudgetsForSelectedMonth
-    .map((category) => category.actualCategorySpending)
-    .reduce((total, current) => {
-      return total + current
-    }, 0)
+  // Pull cash leaving the account to get actual expenses for the month
+  let actualExpensesForSelectedMonth = $derived(cashFlow.cashOut)
 
-  $: discretionarySpendAvailable =
-    budgetedDiscretionarySpendForSelectedMonth + actualDiscretionarySpendForSelectedMonth
+  let actualIncomeForSelectedMonth = $derived(cashFlow.cashIn)
 
-  let showDiscretionarySpend = false
+  let actualCashFlowForSelectedMonth = $derived(
+    actualIncomeForSelectedMonth + actualExpensesForSelectedMonth,
+  )
 
-  $: categoryBudgetsToDisplayForSelectedMonth = showDiscretionarySpend
-    ? discrectionaryCategoryBudgetsForSelectedMonth
-    : transactionsByCategoryForSelectedMonth
+  let categoryBudgetsForSelectedMonth = $derived(
+    categories
+      .filter((category) => category.Category !== 'Paycheck')
+      .map((category) => {
+        if (selectedMonthAndYear === '') {
+          return []
+        }
+        return {
+          categoryName: category.Category,
+          categoryBudgetForMonth: convertDollarSignStringToNumber(
+            category[convertDateToFindCategoryBudget(selectedMonthAndYear)],
+          ),
+        }
+      }),
+  )
 
-  $: estimatedExpensesForSelectedMonth = categoryBudgetsForSelectedMonth.reduce(
-    (total, current) => {
+  let transactionsByCategoryForSelectedMonth = $derived(
+    categories
+      .map((category) => category.Category)
+      .map((categoryName) => {
+        const categoryTransactions = monthTransactions.filter(
+          (transaction) => transaction.Category === categoryName,
+        )
+        const actualCategorySpending = categoryTransactions.reduce((accumulator, transaction) => {
+          return accumulator + parseFloat(transaction.Amount.replace(/[$,]/g, ''))
+        }, 0)
+        const categoryBudget = findCategoryBudgetForSelectedMonth(
+          categoryName,
+          categoryBudgetsForSelectedMonth,
+        )
+        const budgetRemaining = categoryBudget + actualCategorySpending
+        return {
+          categoryTransactions: categoryTransactions,
+          categoryName: categoryName,
+          categoryBudget: categoryBudget,
+          actualCategorySpending: actualCategorySpending,
+          budgetRemaining: budgetRemaining,
+        }
+      }),
+  )
+
+  let discrectionaryCategoryBudgetsForSelectedMonth = $derived(
+    transactionsByCategoryForSelectedMonth.filter(
+      (category) =>
+        category.categoryName === 'Restaurants' ||
+        category.categoryName === 'Gear & Clothing' ||
+        category.categoryName === 'Travel' ||
+        category.categoryName === 'Gas' ||
+        category.categoryName === 'Groceries' ||
+        category.categoryName === 'Entertainment',
+    ),
+  )
+
+  let budgetedDiscretionarySpendForSelectedMonth = $derived(
+    discrectionaryCategoryBudgetsForSelectedMonth
+      .map((category) => category.categoryBudget)
+      .reduce((total, current) => {
+        return total + current
+      }, 0),
+  )
+
+  let actualDiscretionarySpendForSelectedMonth = $derived(
+    discrectionaryCategoryBudgetsForSelectedMonth
+      .map((category) => category.actualCategorySpending)
+      .reduce((total, current) => {
+        return total + current
+      }, 0),
+  )
+
+  let discretionarySpendAvailable = $derived(
+    budgetedDiscretionarySpendForSelectedMonth + actualDiscretionarySpendForSelectedMonth,
+  )
+
+  let showDiscretionarySpend = $state(false)
+
+  let categoryBudgetsToDisplayForSelectedMonth = $derived(
+    showDiscretionarySpend
+      ? discrectionaryCategoryBudgetsForSelectedMonth
+      : transactionsByCategoryForSelectedMonth,
+  )
+
+  let estimatedExpensesForSelectedMonth = $derived(
+    categoryBudgetsForSelectedMonth.reduce((total, current) => {
       return total + current.categoryBudgetForMonth
-    },
-    0,
+    }, 0),
   )
 
   let estimatedMonthlyIncome = 5000
 
-  $: estimatedCashflowForSelectedMonth = estimatedMonthlyIncome - estimatedExpensesForSelectedMonth
+  let estimatedCashflowForSelectedMonth = $derived(
+    estimatedMonthlyIncome - estimatedExpensesForSelectedMonth,
+  )
 
   let hoveredTransactionId = null
   let timer
@@ -147,7 +153,7 @@
       >
         Open Categories
       </a>
-      <button on:click={() => loadCategories()} class="btn btn-info btn-sm">
+      <button onclick={() => console.log('categories')} class="btn btn-info btn-sm">
         Load Categories
       </button>
     </div>
@@ -155,7 +161,7 @@
     <!-- Toggle Discretionary Spend -->
     <div class="mb-4 flex justify-center">
       <button
-        on:click={() => (showDiscretionarySpend = !showDiscretionarySpend)}
+        onclick={() => (showDiscretionarySpend = !showDiscretionarySpend)}
         class="btn btn-outline btn-primary btn-sm"
       >
         {showDiscretionarySpend ? 'Hide' : 'Show'} Discretionary Spend

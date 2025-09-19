@@ -1,3 +1,26 @@
+/**
+ * @param {string} financialDataUrl
+ * @returns {Promise<any | null>}
+ */
+export const loadFinancialData = async (financialDataUrl) => {
+  try {
+    const response = await fetch(financialDataUrl)
+    if (!response.ok) {
+      console.error(
+        'Error fetching assets from google sheet:',
+        response.status,
+        response.statusText,
+      )
+      return null
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error fetching assets from google sheet:', error)
+    return null
+  }
+}
+
 export const formatToPercentage = (number, decimalPlaces = 2) => {
   return (number * 100).toFixed(decimalPlaces) + '%'
 }
