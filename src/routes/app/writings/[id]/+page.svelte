@@ -170,32 +170,45 @@
 
 <div class={`flex ${isEditMode ? 'h-[100dvh]' : 'min-h-[100dvh]'} flex-col`}>
   <!-- Navbar -->
-  <nav class="sticky top-0 z-10 flex h-16 items-center justify-between bg-base-200 p-4">
-    {#if isEditMode}
-      <div class="flex-1 text-left">{!isSaved ? 'Saving...' : 'Saved!!!'}</div>
-    {:else}
-      <div class="flex-1 text-left"></div>
-    {/if}
-    <div class="flex-1 text-center">
+  <nav class="sticky top-0 z-10 bg-base-200 p-3 sm:p-4">
+    <div
+      class="flex flex-col items-stretch gap-2 sm:h-16 sm:flex-row sm:items-center sm:justify-between"
+    >
       {#if isEditMode}
-        <h1 class="text-3xl font-bold" contenteditable bind:textContent={title}></h1>
+        <div class="order-3 flex-1 text-left text-sm text-base-content/70 sm:order-1">
+          {!isSaved ? 'Saving...' : 'Saved!!!'}
+        </div>
       {:else}
-        <h1 class="text-3xl font-bold">{title}</h1>
+        <div class="order-3 flex-1 text-left sm:order-1"></div>
       {/if}
-    </div>
-    <div class="flex-1 text-right">
-      {#if isEditMode}
-        <button class="btn btn-outline btn-primary btn-sm mr-2" onclick={saveChanges}>
-          Save
-        </button>
-      {:else}
-        <button class="btn btn-outline btn-secondary btn-sm mr-2" onclick={toggleEditMode}>
-          Edit
-        </button>
-      {/if}
-      <button class="btn btn-outline btn-error btn-sm" onclick={toggleDeleteWritingModal}
-        >Delete</button
+      <div class="order-1 flex-1 px-1 text-center sm:order-2">
+        {#if isEditMode}
+          <h1
+            class="break-words text-2xl font-bold leading-tight sm:text-3xl"
+            contenteditable
+            bind:textContent={title}
+          ></h1>
+        {:else}
+          <h1 class="break-words text-xl font-bold leading-tight sm:text-3xl">{title}</h1>
+        {/if}
+      </div>
+      <div
+        class="order-2 flex flex-1 flex-wrap items-center justify-center gap-2 sm:order-3 sm:justify-end"
       >
+        {#if isEditMode}
+          <button class="btn btn-outline btn-primary btn-xs sm:btn-sm" onclick={saveChanges}>
+            Save
+          </button>
+        {:else}
+          <button class="btn btn-outline btn-secondary btn-xs sm:btn-sm" onclick={toggleEditMode}>
+            Edit
+          </button>
+        {/if}
+        <button
+          class="btn btn-outline btn-error btn-xs sm:btn-sm"
+          onclick={toggleDeleteWritingModal}>Delete</button
+        >
+      </div>
     </div>
   </nav>
 
