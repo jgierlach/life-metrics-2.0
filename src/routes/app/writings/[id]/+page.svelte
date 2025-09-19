@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import { goto } from '$app/navigation'
   import { marked } from 'marked'
   import Loading from '$lib/components/Loading.svelte'
@@ -38,6 +38,10 @@
         document.body.style.overflow = 'hidden'
         document.documentElement.style.overflow = 'hidden'
       }
+      await tick()
+      if (editableEl) {
+        editableEl.innerText = writingDraft ?? ''
+      }
     }
   }
 
@@ -72,6 +76,16 @@
 
   /** @type {HTMLDivElement | null} */
   let scrollContainerEl
+  /** @type {HTMLDivElement | null} */
+  let editableEl
+
+  /** @param {Event & { currentTarget: HTMLDivElement }} event */
+  function handleEditorInput(event) {
+    const target = event.currentTarget
+    // Normalize text for Markdown: convert NBSP to space and CR/CRLF to LF
+    const raw = target.innerText || ''
+    writingDraft = raw.replace(/\u00A0/g, ' ').replace(/\r\n?|\n/g, '\n')
+  }
 
   async function autoSaveChanges() {
     const response = await fetch('/app/api/writings/edit-writing', {
@@ -194,7 +208,8 @@
       <div class="mx-auto max-w-[800px] px-4 sm:px-6 lg:px-8">
         <div
           contenteditable
-          bind:textContent={writingDraft}
+          bind:this={editableEl}
+          oninput={handleEditorInput}
           class="w-full whitespace-pre-wrap py-4 outline-none"
         ></div>
       </div>
