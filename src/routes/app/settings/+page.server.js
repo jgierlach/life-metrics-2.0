@@ -2,6 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit'
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params, locals, depends }) {
+  depends('app:settings:user')
   const { supabase } = locals
   const session = locals.session
   if (!session) {

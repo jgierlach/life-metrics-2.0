@@ -1,7 +1,7 @@
 <script>
   let { data } = $props()
   import { enhance } from '$app/forms'
-  import { invalidateAll } from '$app/navigation'
+  import { invalidate } from '$app/navigation'
 
   // UI state
   let showDelete = $state(false)
@@ -64,7 +64,7 @@
         if (ok) {
           if (section === 'profile') isProfileDirty = false
           if (section === 'links') isLinksDirty = false
-          await invalidateAll()
+          await invalidate('app:settings:user')
           setTimeout(() => (showSuccess = false), 1200)
         }
       }
