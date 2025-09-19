@@ -146,13 +146,15 @@
           {#each getDisplayedWritings() as post}
             <a
               href={`/app/writings/${post.id}`}
-              class="card h-full bg-base-100 shadow-md transition duration-200 hover:shadow-xl active:scale-[.98]"
+              class="card h-full w-full min-w-0 max-w-full overflow-hidden bg-base-100 shadow-md transition duration-200 hover:shadow-xl active:scale-[.98]"
             >
-              <div class="card-body">
+              <div class="card-body min-w-0">
                 <h3 class="card-title truncate text-lg font-semibold">
                   {post.title || 'Untitled'}
                 </h3>
-                <p class="mt-1 text-sm text-base-content/70">{getPreview(post.writing_draft)}</p>
+                <p class="mt-1 break-words text-sm text-base-content/70">
+                  {getPreview(post.writing_draft)}
+                </p>
                 <div class="mt-4 flex items-center justify-between text-xs text-base-content/60">
                   <span>{formatTimestamp(post.created_at)}</span>
                   <span class="text-primary">Read</span>
